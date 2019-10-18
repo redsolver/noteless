@@ -11,7 +11,7 @@ description: A markdown note-taking app. mobile.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.0.8+8
+version: 0.0.9+9
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -36,6 +36,7 @@ dependencies:
   url_launcher: ^5.2.2
   package_info: ^0.4.0+8
   
+  provider: ^3.1.0+1
 
 
   front_matter: ^1.1.0

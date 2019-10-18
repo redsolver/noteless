@@ -453,7 +453,7 @@ class _EditPageState extends State<EditPage> {
                         ),
                         Container(
                           height: 32,
-                          color: Colors.grey.shade300,
+                          color: Theme.of(context).dividerColor,
                           child: Material(
                             color: Colors.transparent,
                             child: Row(

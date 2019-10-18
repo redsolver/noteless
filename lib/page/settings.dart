@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:notable/provider/theme.dart';
 import 'package:notable/store/notes.dart';
-import 'package:preferences/preference_hider.dart';
 import 'package:preferences/preferences.dart';
 import 'package:preferences/radio_preference.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
   final NotesStore store;
@@ -21,6 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
       'sync_webdav_path': '',
       'sync_webdav_username': '',
       'sync_webdav_password': '',
+      'theme': 'light'
     });
     super.initState();
   }
@@ -32,6 +34,25 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text('Settings'),
       ),
       body: ListView(children: <Widget>[
+        PreferenceTitle('Theme'),
+        RadioPreference(
+          'Light',
+          'light',
+          'theme',
+          isDefault: true,
+          onSelect: () {
+            Provider.of<ThemeNotifier>(context).currentTheme = ThemeType.light;
+          },
+        ),
+        RadioPreference(
+          'Dark',
+          'dark',
+          'theme',
+          onSelect: () {
+            Provider.of<ThemeNotifier>(context).currentTheme = ThemeType.dark;
+          },
+        ),
+        PreferenceTitle('Sync'),
         RadioPreference(
           'No Sync',
           '',

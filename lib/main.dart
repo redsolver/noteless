@@ -11,6 +11,9 @@ import 'package:notable/page/note_list.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import 'provider/theme.dart';
 
 main() async {
   await PrefService.init(prefix: 'pref_');
@@ -18,25 +21,23 @@ main() async {
   await initializeDateFormatting("en_US", null); */
   Intl.defaultLocale = 'en_US';
 
-  runApp(MaterialApp(
-    title: 'Notable',
-    theme: ThemeData(
-        primaryColor: Color(0xfff5b746), accentColor: Color(0xfff5b746)),
-    /*  theme: ThemeData.dark().copyWith(
-          primaryColor: Color(0xfff5b746), accentColor: Color(0xfff5b746)), */
-    home:
-        /*  Banner(
-      location: BannerLocation.bottomStart,
-      message: 'WIP',
-      color: Colors.blue,
-      child: */
-        NoteListPage(),
-    /* ), */
-    localizationsDelegates: [
-      FlutterI18nDelegate(path: 'assets/i18n', fallbackFile: 'en'),
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate
-    ],
-    /* debugShowCheckedModeBanner: false, */
-  ));
+  runApp(ChangeNotifierProvider<ThemeNotifier>.value(
+      value: ThemeNotifier(), child: App()));
+}
+
+class App extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Notable',
+      theme: Provider.of<ThemeNotifier>(context).currentThemeData,
+      home: NoteListPage(),
+      localizationsDelegates: [
+        FlutterI18nDelegate(path: 'assets/i18n', fallbackFile: 'en'),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate
+      ],
+      /* debugShowCheckedModeBanner: false, */
+    );
+  }
 }
