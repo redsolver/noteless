@@ -89,6 +89,17 @@ class _NoteListPageState extends State<NoteListPage> {
     setState(() {});
   }
 
+  Future _modifyAll(Function processNote) async {
+    Navigator.of(context).pop();
+    for (String title in _selectedNotes.toList()) {
+      Note note = store.getNote(title);
+
+      await processNote(note);
+    }
+
+    await _filterAndSortNotes();
+  }
+
   Future _refresh() async {
     print('REFRESH');
     if (store.syncMethod == '') {
@@ -280,11 +291,367 @@ class _NoteListPageState extends State<NoteListPage> {
                       height: 1,
                       color: Colors.grey.shade300,
                     ),
+                    if (_selectedNotes.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                      '${_selectedNotes.length} note${_selectedNotes.length > 1 ? 's' : ''} selected'),
+                                  Row(
+                                    children: <Widget>[
+                                      InkWell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text('ALL'),
+                                        ),
+                                        onTap: () {
+                                          store.shownNotes.forEach((s) {
+                                            _selectedNotes.add(s.title);
+                                          });
+                                          setState(() {});
+                                        },
+                                      ),
+                                      InkWell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text('NONE'),
+                                        ),
+                                        onTap: () {
+                                          store.shownNotes.forEach((s) {
+                                            _selectedNotes.remove(s.title);
+                                          });
+                                          setState(() {});
+                                        },
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(MdiIcons.star),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text('Favorite'),
+                                          content: SingleChildScrollView(
+                                            child: Column(
+                                              children: <Widget>[
+                                                ListTile(
+                                                  leading: Icon(MdiIcons.star),
+                                                  title:
+                                                      Text('Favorite selected'),
+                                                  onTap: () => _modifyAll(
+                                                      (Note note) async {
+                                                    note.favorited = true;
+
+                                                    PersistentStore.saveNote(
+                                                        note);
+                                                  }),
+                                                ),
+                                                ListTile(
+                                                  leading:
+                                                      Icon(MdiIcons.starOff),
+                                                  title: Text(
+                                                      'Unfavorite selected'),
+                                                  onTap: () => _modifyAll(
+                                                      (Note note) async {
+                                                    note.favorited = false;
+                                                    PersistentStore.saveNote(
+                                                        note);
+                                                  }),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(MdiIcons.pin),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text('Pin'),
+                                          content: SingleChildScrollView(
+                                            child: Column(
+                                              children: <Widget>[
+                                                ListTile(
+                                                  leading: Icon(MdiIcons.pin),
+                                                  title: Text('Pin selected'),
+                                                  onTap: () => _modifyAll(
+                                                      (Note note) async {
+                                                    note.pinned = true;
+                                                    PersistentStore.saveNote(
+                                                        note);
+                                                  }),
+                                                ),
+                                                ListTile(
+                                                  leading:
+                                                      Icon(MdiIcons.pinOff),
+                                                  title: Text('Unpin selected'),
+                                                  onTap: () => _modifyAll(
+                                                      (Note note) async {
+                                                    note.pinned = false;
+                                                    PersistentStore.saveNote(
+                                                        note);
+                                                  }),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(MdiIcons.tag),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text('Tags'),
+                                          content: SingleChildScrollView(
+                                            child: Column(
+                                              children: <Widget>[
+                                                ListTile(
+                                                  leading:
+                                                      Icon(MdiIcons.tagPlus),
+                                                  title: Text(
+                                                      'Add Tag to selected notes'),
+                                                  onTap: () async {
+                                                    /* 
+                                                    Navigator.of(context).pop(); */
+                                                    TextEditingController ctrl =
+                                                        TextEditingController();
+                                                    String newTag =
+                                                        await showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (context) =>
+                                                                    AlertDialog(
+                                                                      title: Text(
+                                                                          'Add Tag'),
+                                                                      content:
+                                                                          TextField(
+                                                                        controller:
+                                                                            ctrl,
+                                                                      ),
+                                                                      actions: <
+                                                                          Widget>[
+                                                                        FlatButton(
+                                                                          child:
+                                                                              Text('Cancel'),
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                        ),
+                                                                        FlatButton(
+                                                                          child:
+                                                                              Text('Add'),
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.of(context).pop(ctrl.text);
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ));
+                                                    if ((newTag ?? '').length >
+                                                        0) {
+                                                      print('ADD');
+                                                      await _modifyAll(
+                                                          (Note note) async {
+                                                        note.tags.add(newTag);
+                                                        PersistentStore
+                                                            .saveNote(note);
+                                                      });
+                                                      store.updateTagList();
+                                                    } else {
+                                                      /* Navigator.of(context)
+                                                          .pop(); */
+                                                    }
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  leading:
+                                                      Icon(MdiIcons.tagMinus),
+                                                  title: Text(
+                                                      'Remove Tag from selected notes'),
+                                                  onTap: () async {
+                                                    Set<String> tags = {};
+
+                                                    for (String title
+                                                        in _selectedNotes) {
+                                                      Note note =
+                                                          store.getNote(title);
+                                                      tags.addAll(note.tags);
+                                                    }
+
+                                                    String tagToRemove =
+                                                        await showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (context) =>
+                                                                    AlertDialog(
+                                                                      title: Text(
+                                                                          'Choose Tag to remove'),
+                                                                      content:
+                                                                          SingleChildScrollView(
+                                                                        child:
+                                                                            Column(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            for (String tag
+                                                                                in tags)
+                                                                              ListTile(
+                                                                                  title: Text(tag),
+                                                                                  onTap: () {
+                                                                                    Navigator.of(context).pop(tag);
+                                                                                  })
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                      actions: <
+                                                                          Widget>[
+                                                                        FlatButton(
+                                                                          child:
+                                                                              Text('Cancel'),
+                                                                          onPressed:
+                                                                              () {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ));
+                                                    if ((tagToRemove ?? '')
+                                                            .length >
+                                                        0) {
+                                                      print('REMOVE');
+                                                      await _modifyAll(
+                                                          (Note note) async {
+                                                        note.tags.remove(
+                                                            tagToRemove);
+                                                        PersistentStore
+                                                            .saveNote(note);
+                                                      });
+                                                      store.updateTagList();
+                                                    }
+                                                    /*                      _modifyAll(
+                                                      (Note note) async {
+                                                    note.pinned = false;
+                                                    PersistentStore.saveNote(
+                                                        note);
+                                                  }) */
+                                                  },
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(MdiIcons.delete),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text('Delete selected'),
+                                          content: SingleChildScrollView(
+                                            child: Column(
+                                              children: <Widget>[
+                                                ListTile(
+                                                  leading:
+                                                      Icon(MdiIcons.delete),
+                                                  title: Text('Move to trash'),
+                                                  onTap: () =>
+                                                      _modifyAll((Note note) {
+                                                    note.deleted = true;
+
+                                                    PersistentStore.saveNote(
+                                                        note);
+                                                  }),
+                                                ),
+                                                ListTile(
+                                                    leading: Icon(
+                                                        MdiIcons.deleteForever),
+                                                    title:
+                                                        Text('Delete forever'),
+                                                    onTap: () async {
+                                                      if (await showDialog(
+                                                              context: context,
+                                                              child:
+                                                                  AlertDialog(
+                                                                title: Text(
+                                                                    'Do you really want to delete the selected notes?'),
+                                                                content: Text(
+                                                                    'This will delete them permanently.'),
+                                                                actions: <
+                                                                    Widget>[
+                                                                  FlatButton(
+                                                                    child: Text(
+                                                                        'Cancel'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              false);
+                                                                    },
+                                                                  ),
+                                                                  FlatButton(
+                                                                    child: Text(
+                                                                        'Delete'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              true);
+                                                                    },
+                                                                  )
+                                                                ],
+                                                              )) ??
+                                                          false) {
+                                                        await _modifyAll(
+                                                            (Note note) {
+                                                          store.allNotes
+                                                              .remove(note);
+
+                                                          PersistentStore
+                                                              .deleteNote(note);
+                                                          _selectedNotes.remove(
+                                                              note.title);
+                                                        });
+                                                      }
+                                                    })
+                                              ],
+                                            ),
+                                          ),
+                                        ));
+                              },
+                            ),
+      
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 1,
+                        color: Colors.grey.shade300,
+                      ),
+                    ],
                     for (Note note in store.shownNotes)
                       Slidable(
                         actionPane: SlidableDrawerActionPane(),
                         actions: <Widget>[
-                          if (note.deleted)
+                          /*        if (note.deleted)
                             IconSlideAction(
                               caption: 'Delete',
                               color: Colors.red,
@@ -334,8 +701,10 @@ class _NoteListPageState extends State<NoteListPage> {
                                 await _filterAndSortNotes();
                               },
                             ),
+                       */
                         ],
                         child: ListTile(
+                          selected: _selectedNotes.contains(note.title),
                           title: Text(note.title),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -367,9 +736,28 @@ class _NoteListPageState extends State<NoteListPage> {
                             ],
                           ),
                           onTap: () async {
+                            if (_selectedNotes.isNotEmpty) {
+                              setState(() {
+                                if (_selectedNotes.contains(note.title)) {
+                                  _selectedNotes.remove(note.title);
+                                } else {
+                                  _selectedNotes.add(note.title);
+                                }
+                              });
+                              return;
+                            }
                             await Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => EditPage(note, store)));
                             _filterAndSortNotes();
+                          },
+                          onLongPress: () {
+                            setState(() {
+                              if (_selectedNotes.contains(note.title)) {
+                                _selectedNotes.remove(note.title);
+                              } else {
+                                _selectedNotes.add(note.title);
+                              }
+                            });
                           },
                         ),
                       )
@@ -486,6 +874,8 @@ class _NoteListPageState extends State<NoteListPage> {
       ),
     );
   }
+
+  Set<String> _selectedNotes = {};
 
   /* _setFilterTagAndRefresh(BuildContext context, String tag) {
     Navigator.of(context).pop();

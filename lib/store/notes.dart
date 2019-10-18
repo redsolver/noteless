@@ -59,7 +59,6 @@ class NotesStore {
       }
     }
 
-
     /* for (String fileName in Samples.tutorialNotes) {
       File('${notesDir.path}/$fileName').writeAsStringSync(
           await rootBundle.loadString('assets/tutorial/notes/$fileName'));
@@ -176,5 +175,9 @@ class NotesStore {
         return await WebdavSync().syncFiles();
     }
     return null;
+  }
+
+  Note getNote(String title) {
+    return allNotes.firstWhere((n) => n.title == title);
   }
 }
