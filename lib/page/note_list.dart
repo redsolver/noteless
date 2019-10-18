@@ -290,10 +290,35 @@ class _NoteListPageState extends State<NoteListPage> {
                               color: Colors.red,
                               icon: Icons.delete_forever,
                               onTap: () async {
-                                store.allNotes.remove(note);
-                                PersistentStore.deleteNote(note);
+                                if (await showDialog(
+                                        context: context,
+                                        child: AlertDialog(
+                                          title: Text(
+                                              'Do you really want to delete this note?'),
+                                          content: Text(
+                                              'This will delete it permanently.'),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              child: Text('Cancel'),
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .pop(false);
+                                              },
+                                            ),
+                                            FlatButton(
+                                              child: Text('Delete'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true);
+                                              },
+                                            )
+                                          ],
+                                        )) ??
+                                    false) {
+                                  store.allNotes.remove(note);
+                                  PersistentStore.deleteNote(note);
 
-                                await _filterAndSortNotes();
+                                  await _filterAndSortNotes();
+                                }
                               },
                             ),
                           if (!note.deleted)
