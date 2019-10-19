@@ -7,7 +7,7 @@ Test it here:
 
 ## Changelog
 
-## 0.1.1
+### 0.1.1
 
 - Added option to select data directory on device
 - Moved multi select options to bottom app bar
