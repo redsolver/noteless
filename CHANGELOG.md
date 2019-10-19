@@ -4,6 +4,7 @@
 
 - Moved multi select options to bottom app bar
 - Pressing back while being in select mode cancels it
+- Added option to recreate all tutorial notes and attachments in settings
 
 ## 0.1.0
 

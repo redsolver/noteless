@@ -102,6 +102,39 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
+        PreferenceTitle('More'),
+        ListTile(
+          title: Text('Recreate tutorial notes'),
+          onTap: () async {
+            if (await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: Text(
+                              'Do you want to recreate the tutorial notes and attachments?'),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text('Cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                            ),
+                            FlatButton(
+                              child: Text('Recreate'),
+                              onPressed: () {
+                                Navigator.of(context).pop(true);
+                              },
+                            )
+                          ],
+                        )) ??
+                false) {
+              await store.createTutorialNotes();
+              await store.createTutorialAttachments();
+              await store.listNotes();
+              await store.filterAndSortNotes();
+              await store.updateTagList();
+            }
+          },
+        )
       ]),
     );
   }

@@ -28,6 +28,22 @@ class NotesStore {
     syncMethod = PrefService.getString('sync') ?? '';
   }
 
+  Future createTutorialNotes() async {
+    for (String fileName in Samples.tutorialNotes) {
+      File('${notesDir.path}/$fileName').writeAsStringSync(
+          await rootBundle.loadString('assets/tutorial/notes/$fileName'));
+    }
+  }
+
+  Future createTutorialAttachments() async {
+    for (String fileName in Samples.tutorialAttachments) {
+      File('${attachmentsDir.path}/$fileName').writeAsBytesSync(
+          (await rootBundle.load('assets/tutorial/attachments/$fileName'))
+              .buffer
+              .asUint8List());
+    }
+  }
+
   Future listNotes() async {
     final directory = await getApplicationDocumentsDirectory();
 
@@ -37,26 +53,14 @@ class NotesStore {
 
     if (!notesDir.existsSync()) {
       notesDir.createSync();
-      for (String fileName in Samples.tutorialNotes) {
-        File('${notesDir.path}/$fileName').writeAsStringSync(
-            await rootBundle.loadString('assets/tutorial/notes/$fileName'));
-      }
-      /* for (String sampleFileName in Samples.samples.keys) {
-        File('${notesDir.path}/$sample FileName')
-            .writeAsStringSync(Samples.samples[sampleFileName]);
-      } */
+      await createTutorialNotes();
     }
     attachmentsDir = Directory('${directory.path}/attachments');
     PrefService.setString('notable_attachments_directory', attachmentsDir.path);
 
     if (!attachmentsDir.existsSync()) {
       attachmentsDir.createSync();
-      for (String fileName in Samples.tutorialAttachments) {
-        File('${attachmentsDir.path}/$fileName').writeAsBytesSync(
-            (await rootBundle.load('assets/tutorial/attachments/$fileName'))
-                .buffer
-                .asUint8List());
-      }
+      await createTutorialAttachments();
     }
 
     /* for (String fileName in Samples.tutorialNotes) {
