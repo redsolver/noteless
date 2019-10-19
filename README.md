@@ -2,8 +2,9 @@
 
 This app is UNOFFICIAL.
 
-Test it here:
-[https://keybase.pub/redsolver/notable/notable-alpha_0.1.3.apk](https://keybase.pub/redsolver/notable/notable-alpha_0.1.3.apk)
+## Download
+
+[https://github.com/redsolver/notable-mobile/releases](https://github.com/redsolver/notable-mobile/releases)
 
 ## Changelog
 
