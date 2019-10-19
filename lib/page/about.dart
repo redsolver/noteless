@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notable/store/notes.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info/package_info.dart';
 
 class AboutPage extends StatefulWidget {
   final NotesStore store;
@@ -17,13 +19,39 @@ class _AboutPageState extends State<AboutPage> {
         ),
         body: Center(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            FutureBuilder(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snap) {
+                if (!snap.hasData) return Container();
+                PackageInfo info = snap.data;
+                return Column(
+                  children: <Widget>[
+                    Text('${info.appName}'),
+                    Text('${info.packageName}'),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    Text('Version ${info.version}'),
+                    Text('Build ${info.buildNumber}'),
+                  ],
+                );
+              },
+            ),
+            SizedBox(
+              height: 16,
+            ),
             Text('This app is unofficial'),
             SizedBox(
               height: 16,
             ),
-            Text('<< More interesting facts about this app >>'),
+            RaisedButton(
+              child: Text('GitHub Repo'),
+              onPressed: () {
+                launch('https://github.com/redsolver/notable-mobile');
+              },
+            ),
           ],
         )));
   }
