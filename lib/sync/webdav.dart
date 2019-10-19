@@ -40,7 +40,7 @@ class WebdavSync {
     print('SYNCSYNCSYNC $path');
     print(noteFiles);
 
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = Directory(PrefService.getString('notable_directory'));
 
     final fileDir = Directory('${directory.path}/$dir');
 
