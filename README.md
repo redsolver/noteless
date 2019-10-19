@@ -3,9 +3,18 @@
 This app is UNOFFICIAL.
 
 Test it here:
-[https://keybase.pub/redsolver/notable/notable-alpha_0.1.0.apk](https://keybase.pub/redsolver/notable/notable-alpha_0.1.0.apk)
+[https://keybase.pub/redsolver/notable/notable-alpha_0.1.1.apk](https://keybase.pub/redsolver/notable/notable-alpha_0.1.1.apk)
 
 ## Changelog
+
+## 0.1.1
+
+- Added option to select data directory on device
+- Moved multi select options to bottom app bar
+- Pressing back while being in select mode cancels it
+- Added option to recreate all tutorial notes and attachments in settings
+- Updated info page
+- Dark Theme now supports markdown preview
 
 ### 0.1.0
 
