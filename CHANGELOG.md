@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Fixed sync when using different data directory
+
 ## 0.1.1
 
 - Added option to select data directory on device
