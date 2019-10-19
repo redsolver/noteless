@@ -1,4 +1,4 @@
-# notable_mobile
+# Notable Mobile
 
 This app is UNOFFICIAL.
 
