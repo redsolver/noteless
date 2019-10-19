@@ -60,8 +60,8 @@ class WebdavSync {
 
       print(info.name);
       print(info.contentType);
-      print(info.creationTime);
-      print(info.modificationTime);
+      print(info.ctime);
+      print(info.mtime);
 
       String name = Uri.decodeFull(info.name).split('/').last;
       print(name);
@@ -73,7 +73,7 @@ class WebdavSync {
 
       String localFilePath = '${fileDir.path}/${name}';
       File localFile = File(localFilePath);
-      DateTime lastModifiedServer = format.parse(info.modificationTime, true);
+      DateTime lastModifiedServer = format.parse(info.mtime, true);
 
       print('LMS $lastModifiedServer');
 

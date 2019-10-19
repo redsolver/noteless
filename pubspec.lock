@@ -456,7 +456,7 @@ packages:
       name: webdav
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.6-dev"
+    version: "1.0.5-dev"
   webview_flutter:
     dependency: "direct main"
     description:
@@ -471,6 +471,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.5.0"
+  xml2json:
+    dependency: transitive
+    description:
+      name: xml2json
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.3"
   yaml:
     dependency: "direct main"
     description:

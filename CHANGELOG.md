@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Fixed webdav sync
+
 ## 0.1.2
 
 - Fixed sync when using different data directory

@@ -3,9 +3,13 @@
 This app is UNOFFICIAL.
 
 Test it here:
-[https://keybase.pub/redsolver/notable/notable-alpha_0.1.2.apk](https://keybase.pub/redsolver/notable/notable-alpha_0.1.2.apk)
+[https://keybase.pub/redsolver/notable/notable-alpha_0.1.3.apk](https://keybase.pub/redsolver/notable/notable-alpha_0.1.3.apk)
 
 ## Changelog
+
+### 0.1.3
+
+- Fixed webdav sync
 
 ### 0.1.2
 
