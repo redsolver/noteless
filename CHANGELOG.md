@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Moved multi select options to bottom app bar
+- Pressing back while being in select mode cancels it
+
 ## 0.1.0
 
 - Select multiple notes by long pressing
