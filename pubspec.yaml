@@ -43,6 +43,8 @@ dependencies:
   zefyr: ^0.8.0
   flutter_slidable: ^0.5.4
   #time_machine: ^0.9.9
+  directory_picker: ^1.0.0
+
 
 
 

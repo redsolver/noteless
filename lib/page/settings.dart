@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:directory_picker/directory_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:notable/provider/theme.dart';
 import 'package:notable/store/notes.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:preferences/preferences.dart';
 import 'package:preferences/radio_preference.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +56,53 @@ class _SettingsPageState extends State<SettingsPage> {
             Provider.of<ThemeNotifier>(context).currentTheme = ThemeType.dark;
           },
         ),
+        if (Platform.isAndroid) ...[
+          PreferenceTitle('Data Directory'),
+          SwitchPreference(
+            'Use external storage',
+            'notable_external_directory_enabled',
+            onChange: () async {
+              if (PrefService.getString('notable_external_directory') == null) {
+                PrefService.setString('notable_external_directory',
+                    (await getExternalStorageDirectory()).path);
+              }
+
+              await store.listNotes();
+              await store.filterAndSortNotes();
+              await store.updateTagList();
+
+              setState(() {});
+            },
+          ),
+          PreferenceHider([
+            ListTile(
+              title: Text('Location'),
+              subtitle: Text(
+                PrefService.getString('notable_external_directory') ?? '',
+              ),
+              onTap: () async {
+                String path =
+                    PrefService.getString('notable_external_directory');
+                Directory newDirectory = await DirectoryPicker.pick(
+                    allowFolderCreation: true,
+                    context: context,
+                    rootDirectory: path != null
+                        ? Directory(path)
+                        : (await getExternalStorageDirectory()));
+                print(newDirectory);
+                if (newDirectory != null) {
+                  PrefService.setString(
+                      'notable_external_directory', newDirectory.path);
+
+                  await store.listNotes();
+                  await store.filterAndSortNotes();
+                  await store.updateTagList();
+                  setState(() {});
+                }
+              },
+            ),
+          ], '!notable_external_directory_enabled'),
+        ],
         PreferenceTitle('Sync'),
         RadioPreference(
           'No Sync',

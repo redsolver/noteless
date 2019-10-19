@@ -45,7 +45,14 @@ class NotesStore {
   }
 
   Future listNotes() async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory directory;
+    if (PrefService.getBool('notable_external_directory_enabled') ?? false) {
+      directory =
+          Directory(PrefService.getString('notable_external_directory'));
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+    PrefService.setString('notable_directory', directory.path);
 
     notesDir = Directory('${directory.path}/notes');
 
