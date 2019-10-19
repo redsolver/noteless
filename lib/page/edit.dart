@@ -8,10 +8,12 @@ import 'package:markd/markdown.dart' as markd;
 import 'package:front_matter/front_matter.dart' as fm;
 import 'package:bsdiff/bsdiff.dart';
 import 'package:notable/page/note_list.dart';
+import 'package:notable/provider/theme.dart';
 import 'package:notable/store/notes.dart';
 import 'package:notable/store/persistent.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:preferences/preference_service.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -178,14 +180,48 @@ class _EditPageState extends State<EditPage> {
                         .replaceAll(' ', '%20');
                   });
 
+                  ThemeData theme = Theme.of(context);
+
+                  String backgroundColor = theme.scaffoldBackgroundColor.value
+                      .toRadixString(16)
+                      .padLeft(8, '0')
+                      .substring(2);
+
+                  String textColor = theme.textTheme.body1.color.value
+                      .toRadixString(16)
+                      .padLeft(8, '0')
+                      .substring(2);
+
+                  String accentColor = theme.accentColor.value
+                      .toRadixString(16)
+                      .padLeft(8, '0')
+                      .substring(2);
+
                   String generatedPreview = '''
 <!DOCTYPE html>
 <html>
 <head>
+''' +
+                      (Provider.of<ThemeNotifier>(context).currentTheme ==
+                              ThemeType.light
+                          ? ''
+                          : '''
+<style>
+  body {
+    background-color: #$backgroundColor;
+    color: #$textColor;
+  }
+  a {
+    color: #$accentColor;
+  }
+  img {
+    filter: grayscale(20%);
+  }
+</style>
 	<link href="file:///android_asset/flutter_assets/assets/preview/prism.css" rel="stylesheet" />
 </head>
 <body>
-''' +
+                      ''') +
                       markd.markdownToHtml(
                         content,
                         extensionSet: markd.ExtensionSet.gitHubWeb,
