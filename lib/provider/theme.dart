@@ -3,37 +3,18 @@ import 'package:preferences/preference_service.dart';
 
 class ThemeNotifier with ChangeNotifier {
   ThemeNotifier() {
-    setTheme(PrefService.getString('theme') ?? 'light');
+    _accentColor = Color(PrefService.getInt('theme_color') ?? 0xfff5b746);
+    updateTheme(PrefService.getString('theme') ?? 'light');
   }
-  static final List<ThemeData> themeData = [
-    ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Color(0xfff5b746),
-        accentColor: Color(0xfff5b746)),
-    ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Color(0xfff5b746),
-        accentColor: Color(0xfff5b746))
-  ];
 
-  ThemeType _currentTheme = ThemeType.light;
-  ThemeData _currentThemeData = themeData[0];
+  ThemeType currentTheme = ThemeType.light;
+  ThemeData _currentThemeData;
 
   void switchTheme() => currentTheme == ThemeType.light
       ? currentTheme = ThemeType.dark
       : currentTheme = ThemeType.light;
 
-  set currentTheme(ThemeType theme) {
-    if (theme != null) {
-      _currentTheme = theme;
-      _currentThemeData =
-          currentTheme == ThemeType.light ? themeData[0] : themeData[1];
-
-      notifyListeners();
-    }
-  }
-
-  setTheme(String theme) {
+  updateTheme([String theme]) {
     switch (theme) {
       case 'light':
         currentTheme = ThemeType.light;
@@ -42,13 +23,38 @@ class ThemeNotifier with ChangeNotifier {
         currentTheme = ThemeType.dark;
         break;
     }
-    _currentThemeData =
-        currentTheme == ThemeType.light ? themeData[0] : themeData[1];
+    _currentThemeData = ThemeData(
+      brightness:
+          currentTheme == ThemeType.light ? Brightness.light : Brightness.dark,
+      accentColor: _accentColor,
+      primaryColor: _accentColor,
+      buttonColor: _accentColor,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: _accentColor,
+      ),
+      buttonTheme: ButtonThemeData(
+        textTheme: ButtonTextTheme.primary,
+        buttonColor: _accentColor,
+      ),
+      textTheme: TextTheme(
+        button: TextStyle(color: _accentColor),
+      ),
+    );
     notifyListeners();
   }
 
-  get currentTheme => _currentTheme;
   get currentThemeData => _currentThemeData;
+
+  Color _accentColor;
+
+  get accentColor => _accentColor;
+  set accentColor(Color color) {
+    if (color != null) {
+      _accentColor = color;
+
+      updateTheme();
+    }
+  }
 }
 
 enum ThemeType { light, dark }

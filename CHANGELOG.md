@@ -1,5 +1,9 @@
 # Changelog
 
+## master
+
+- Added option to change accent color
+
 ## 0.1.3
 
 - Fixed webdav sync

@@ -45,7 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
           'theme',
           isDefault: true,
           onSelect: () {
-            Provider.of<ThemeNotifier>(context).currentTheme = ThemeType.light;
+            Provider.of<ThemeNotifier>(context).updateTheme('light');
           },
         ),
         RadioPreference(
@@ -53,7 +53,64 @@ class _SettingsPageState extends State<SettingsPage> {
           'dark',
           'theme',
           onSelect: () {
-            Provider.of<ThemeNotifier>(context).currentTheme = ThemeType.dark;
+            Provider.of<ThemeNotifier>(context).updateTheme('dark');
+          },
+        ),
+        ListTile(
+          title: Text('Accent Color'),
+          trailing: Padding(
+            padding: const EdgeInsets.only(right: 9, left: 9),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(),
+                color: Color(PrefService.getInt('theme_color') ?? 0xfff5b746),
+              ),
+              child: SizedBox(
+                width: 28,
+                height: 28,
+              ),
+            ),
+          ),
+          onTap: () async {
+            Color color = await showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: Text('Select accent color'),
+                      content: Container(
+                        child: GridView.count(
+                          crossAxisCount: 5,
+                          children: [
+                            for (Color color in [
+                              Color(0xfff5b746),
+                              ...Colors.primaries,
+                              ...Colors.accents,
+                            ])
+                              InkWell(
+                                child: Container(
+                                  margin: const EdgeInsets.all(5),
+                                  color: color,
+                                ),
+                                onTap: () {
+                                  Navigator.of(context).pop(color);
+                                },
+                              )
+                          ],
+                        ),
+                        width: MediaQuery.of(context).size.width * .7,
+                      ),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ));
+            if (color != null) {
+              PrefService.setInt('theme_color', color.value);
+              Provider.of<ThemeNotifier>(context).accentColor = color;
+            }
           },
         ),
         if (Platform.isAndroid) ...[
