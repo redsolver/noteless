@@ -28,6 +28,12 @@ This app is UNOFFICIAL.
 
 ## Changelog
 
+### 0.1.4
+
+- Added KaTeX and mhchem support
+- Added option to change accent color
+- Added note swipe actions (trash, delete, pin and favorite)
+
 ### 0.1.3
 
 - Fixed webdav sync

@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 0.1.4
 
 - Added KaTeX and mhchem support
 - Added option to change accent color
