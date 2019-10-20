@@ -207,6 +207,7 @@ class _EditPageState extends State<EditPage> {
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8"/>
 ''' +
                       (Provider.of<ThemeNotifier>(context).currentTheme ==
                               ThemeType.light
@@ -287,47 +288,50 @@ class _EditPageState extends State<EditPage> {
                           appBar: AppBar(
                             title: Text('Preview'),
                           ),
-                          body: WebView(
-                            initialUrl: 'file://' + previewFile.path,
-                            javascriptMode: JavascriptMode.unrestricted,
-                            onWebViewCreated: (ctrl) {},
-                            navigationDelegate: (request) {
-                              print(request.url);
+                          body: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal:8.0),
+                            child: WebView(
+                              initialUrl: 'file://' + previewFile.path,
+                              javascriptMode: JavascriptMode.unrestricted,
+                              onWebViewCreated: (ctrl) {},
+                              navigationDelegate: (request) {
+                                print(request.url);
 
-                              if (request.url.startsWith('file://')) {
-                                String link = Uri.decodeFull(
-                                    RegExp(r'@.*').stringMatch(request.url));
-                                print(link);
+                                if (request.url.startsWith('file://')) {
+                                  String link = Uri.decodeFull(
+                                      RegExp(r'@.*').stringMatch(request.url));
+                                  print(link);
 
-                                String type =
-                                    RegExp(r'(?<=@).*(?=/)').stringMatch(link);
+                                  String type =
+                                      RegExp(r'(?<=@).*(?=/)').stringMatch(link);
 
-                                String data =
-                                    RegExp(r'(?<=/).*').stringMatch(link);
-                                print(type);
-                                print(data);
-                                print(Theme.of(context).brightness);
-                                switch (type) {
-                                  case 'note':
-                                    _navigateToNote(data);
+                                  String data =
+                                      RegExp(r'(?<=/).*').stringMatch(link);
+                                  print(type);
+                                  print(data);
+                                  print(Theme.of(context).brightness);
+                                  switch (type) {
+                                    case 'note':
+                                      _navigateToNote(data);
 
-                                    break;
-                                  case 'tag':
-                                    _navigateToTag(data);
-                                    break;
-                                  case 'search':
-                                    _navigateToSearch(data);
-                                    break;
-                                  case 'attachment':
-                                    break;
+                                      break;
+                                    case 'tag':
+                                      _navigateToTag(data);
+                                      break;
+                                    case 'search':
+                                      _navigateToSearch(data);
+                                      break;
+                                    case 'attachment':
+                                      break;
+                                  }
+                                } else {
+                                  launch(
+                                    request.url,
+                                  );
                                 }
-                              } else {
-                                launch(
-                                  request.url,
-                                );
-                              }
-                              return NavigationDecision.prevent;
-                            },
+                                return NavigationDecision.prevent;
+                              },
+                            ),
                           ))));
                 },
               ),
