@@ -2,6 +2,7 @@
 
 ## master
 
+- Added KaTeX and mhchem support
 - Added option to change accent color
 
 ## 0.1.3

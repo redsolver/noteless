@@ -76,6 +76,7 @@ flutter:
     - assets/tutorial/notes/
     - assets/tutorial/attachments/
     - assets/i18n/
+    - assets/preview/fonts/
     - assets/preview/
   
   #  - images/a_dot_burr.jpeg

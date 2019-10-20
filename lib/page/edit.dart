@@ -162,6 +162,9 @@ class _EditPageState extends State<EditPage> {
 
                   final previewDir = Directory('${directory.path}/preview');
 
+                  const staticPreviewDir =
+                      'file:///android_asset/flutter_assets/assets/preview';
+
                   /*  final previewAssetsDir =
                       Directory('${directory.path}/preview/assets'); */
 
@@ -179,6 +182,8 @@ class _EditPageState extends State<EditPage> {
                         .substring(match.start, match.end)
                         .replaceAll(' ', '%20');
                   });
+
+                  content = content.replaceAll(RegExp(r'\\\\'), '\\\\\\\\');
 
                   ThemeData theme = Theme.of(context);
 
@@ -206,7 +211,7 @@ class _EditPageState extends State<EditPage> {
                               ThemeType.light
                           ? ''
                           : '''
-<style>
+  <style>
   body {
     background-color: #$backgroundColor;
     color: #$textColor;
@@ -217,21 +222,45 @@ class _EditPageState extends State<EditPage> {
   img {
     filter: grayscale(20%);
   }
-</style>
-	<link href="file:///android_asset/flutter_assets/assets/preview/prism.css" rel="stylesheet" />
+  </style>
+  ''') +
+                      '''
+
+	<link href="$staticPreviewDir/prism.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="$staticPreviewDir/katex.min.css">
+
+  <script defer src="$staticPreviewDir/katex.min.js"></script>
+
+  <script defer src="$staticPreviewDir/mhchem.min.js"></script>
+
+
+    <!-- KaTeX auto-render extension -->
+    <script defer src="$staticPreviewDir/katex.auto-render.min.js"
+        onload="renderMathInElement(document.body, 
+        {delimiters:
+        [
+          {left: '\$\$', right: '\$\$', display: true},
+          {left: '\$', right: '\$', display: false}
+        ],
+        preProcess: (math)=>math.trim()
+        });
+"></script>
+
+
 </head>
 <body>
-                      ''') +
+                      ''' +
                       markd.markdownToHtml(
                         content,
                         extensionSet: markd.ExtensionSet.gitHubWeb,
                       ) +
                       '''
-<script src="file:///android_asset/flutter_assets/assets/preview/mermaid.min.js"></script>
+<script src="$staticPreviewDir/mermaid.min.js"></script>
 <script>mermaid.initialize({startOnLoad:true}, ".language-mermaid");</script>
 
 
-      <script src="file:///android_asset/flutter_assets/assets/preview/prism.js"></script>
+      <script src="$staticPreviewDir/prism.js"></script>
 
       
   <script>
