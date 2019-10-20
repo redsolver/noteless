@@ -4,6 +4,7 @@
 
 - Added KaTeX and mhchem support
 - Added option to change accent color
+- Added note swipe actions (trash, delete, pin and favorite)
 
 ## 0.1.3
 

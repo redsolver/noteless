@@ -301,7 +301,7 @@ class _NoteListPageState extends State<NoteListPage> {
                       Slidable(
                         actionPane: SlidableDrawerActionPane(),
                         actions: <Widget>[
-                          /*        if (note.deleted)
+                          if (note.deleted)
                             IconSlideAction(
                               caption: 'Delete',
                               color: Colors.red,
@@ -351,7 +351,34 @@ class _NoteListPageState extends State<NoteListPage> {
                                 await _filterAndSortNotes();
                               },
                             ),
-                       */
+                        ],
+                        secondaryActions: <Widget>[
+                          IconSlideAction(
+                            caption: note.favorited ? 'Unstar' : 'Star',
+                            color: Colors.yellow,
+                            icon: note.favorited
+                                ? MdiIcons.starOff
+                                : MdiIcons.star,
+                            onTap: () async {
+                              note.favorited = !note.favorited;
+
+                              PersistentStore.saveNote(note);
+
+                              await _filterAndSortNotes();
+                            },
+                          ),
+                          IconSlideAction(
+                            caption: note.pinned ? 'Unpin' : 'Pin',
+                            color: Colors.green,
+                            icon: note.pinned ? MdiIcons.pinOff : MdiIcons.pin,
+                            onTap: () async {
+                              note.pinned = !note.pinned;
+
+                              PersistentStore.saveNote(note);
+
+                              await _filterAndSortNotes();
+                            },
+                          ),
                         ],
                         child: ListTile(
                           selected: _selectedNotes.contains(note.title),
