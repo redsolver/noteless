@@ -28,6 +28,14 @@ This app is UNOFFICIAL.
 
 ## Changelog
 
+### 0.1.5
+
+- Added feature to add and remove attachments
+- Searching in content of notes
+  - Enabled by default
+  - Can be disabled in settings
+  - Can get slow with more than 2000 notes
+
 ### 0.1.4
 
 - Added KaTeX and mhchem support

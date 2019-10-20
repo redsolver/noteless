@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 0.1.5
 
 - Added feature to add and remove attachments
 - Searching in content of notes
