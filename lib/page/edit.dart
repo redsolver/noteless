@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:notable/model/note.dart';
@@ -332,14 +333,81 @@ class _EditPageState extends State<EditPage> {
               ),
               PopupMenuButton<String>(
                 onSelected: (String result) async {
-                  print(result);
-                  switch (result.split('.')[0]) {
+                  int divIndex = result.indexOf('.');
+                  if (divIndex == -1) divIndex = result.length;
+
+                  switch (result.substring(0, divIndex)) {
                     case 'favorite':
                       note.favorited = !note.favorited;
 
                       break;
                     case 'pin':
                       note.pinned = !note.pinned;
+
+                      break;
+
+                    case 'addAttachment':
+                      File file = await FilePicker.getFile();
+
+                      if (file != null) {
+                        String fullFileName = file.path.split('/').last;
+                        int dotIndex = fullFileName.indexOf('.');
+
+                        String fileName = fullFileName.substring(0, dotIndex);
+                        String fileEnding = fullFileName.substring(dotIndex);
+
+                        File newFile = File(
+                            store.attachmentsDir.path + '/' + fullFileName);
+
+                        int i = 0;
+
+                        while (newFile.existsSync()) {
+                          i++;
+                          newFile = File(store.attachmentsDir.path +
+                              '/' +
+                              fileName +
+                              ' ($i)' +
+                              fileEnding);
+                        }
+                        await file.copy(newFile.path);
+
+                        note.attachments.add(newFile.path.split('/').last);
+
+                        await file.delete();
+                      }
+
+                      break;
+
+                    case 'removeAttachment':
+                      String attachment = result.substring(divIndex + 1);
+
+                      bool remove = await showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: Text('Delete Attachment'),
+                                content: Text(
+                                    'Do you want to delete the attachment "$attachment"? This will remove it from this note and delete it permanently on disk.'),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text('Cancel'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  FlatButton(
+                                    child: Text('Delete'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              ));
+                      if (remove ?? false) {
+                        File file =
+                            File(store.attachmentsDir.path + '/' + attachment);
+                        await file.delete();
+                        note.attachments.remove(attachment);
+                      }
 
                       break;
 
@@ -375,9 +443,7 @@ class _EditPageState extends State<EditPage> {
                       break;
 
                     case 'removeTag':
-                      print(result.substring(10));
-
-                      String tag = result.substring(10);
+                      String tag = result.substring(divIndex + 1);
 
                       bool remove = await showDialog(
                           context: context,
@@ -432,6 +498,31 @@ class _EditPageState extends State<EditPage> {
                           width: 8,
                         ),
                         Text(note.pinned ? 'Unpin' : 'Pin'),
+                      ],
+                    ),
+                  ),
+                  for (String attachment in note.attachments)
+                    PopupMenuItem<String>(
+                      value: 'removeAttachment.$attachment',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(MdiIcons.paperclip),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(attachment),
+                        ],
+                      ),
+                    ),
+                  PopupMenuItem<String>(
+                    value: 'addAttachment',
+                    child: Row(
+                      children: <Widget>[
+                        Icon(MdiIcons.filePlus),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text('Add Attachment'),
                       ],
                     ),
                   ),

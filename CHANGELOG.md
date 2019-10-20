@@ -2,6 +2,7 @@
 
 ## master
 
+- Added feature to add and remove attachments
 - Searching in content of notes
   - Enabled by default
   - Can be disabled in settings
