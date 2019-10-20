@@ -629,6 +629,7 @@ class _EditPageState extends State<EditPage> {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => NoteListPage(
               filterTag: tag,
+              isFirstPage: false,
             )));
   }
 
@@ -636,6 +637,7 @@ class _EditPageState extends State<EditPage> {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => NoteListPage(
               searchText: search,
+              isFirstPage: false,
             )));
   }
 }

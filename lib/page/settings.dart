@@ -26,7 +26,8 @@ class _SettingsPageState extends State<SettingsPage> {
       'sync_webdav_path': '',
       'sync_webdav_username': '',
       'sync_webdav_password': '',
-      'theme': 'light'
+      'theme': 'light',
+      'search_content': true
     });
     super.initState();
   }
@@ -128,7 +129,7 @@ class _SettingsPageState extends State<SettingsPage> {
               await store.filterAndSortNotes();
               await store.updateTagList();
 
-              setState(() {});
+              if (mounted) setState(() {});
             },
           ),
           PreferenceHider([
@@ -160,6 +161,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ], '!notable_external_directory_enabled'),
         ],
+        PreferenceTitle('Search'),
+        SwitchPreference(
+          'Search content of notes',
+          'search_content',
+        ),
         PreferenceTitle('Sync'),
         RadioPreference(
           'No Sync',
@@ -242,7 +248,7 @@ class _SettingsPageState extends State<SettingsPage> {
               await store.updateTagList();
             }
           },
-        )
+        ),
       ]),
     );
   }

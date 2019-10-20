@@ -31,7 +31,9 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Notable',
       theme: Provider.of<ThemeNotifier>(context).currentThemeData,
-      home: NoteListPage(),
+      home: NoteListPage(
+        isFirstPage: true,
+      ),
       localizationsDelegates: [
         FlutterI18nDelegate(path: 'assets/i18n', fallbackFile: 'en'),
         GlobalMaterialLocalizations.delegate,

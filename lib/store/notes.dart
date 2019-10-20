@@ -115,16 +115,38 @@ class NotesStore {
     //shownNotes = List.from(allNotes);
 
     shownNotes = _filterByTag(allNotes, currentTag);
+
     if (searchText != null) {
       List keywords =
           searchText.split(' ').map((s) => s.toLowerCase()).toList();
-      shownNotes.retainWhere((note) {
-        String noteTitle = note.title.toLowerCase();
-        for (String keyword in keywords) {
-          if (!noteTitle.contains(keyword)) return false;
+
+      if (PrefService.getBool('search_content') ?? true) {
+        List<String> toRemove = [];
+
+        for (Note note in shownNotes) {
+          String content = note.file.readAsStringSync().toLowerCase();
+
+          bool _contains = true;
+          for (String keyword in keywords) {
+            if (!content.contains(keyword)) {
+              _contains = false;
+              break;
+            }
+          }
+          if (!_contains) {
+            toRemove.add(note.title);
+          }
         }
-        return true;
-      });
+        shownNotes.removeWhere((n) => toRemove.contains(n.title));
+      } else {
+        shownNotes.retainWhere((note) {
+          String noteTitle = note.title.toLowerCase();
+          for (String keyword in keywords) {
+            if (!noteTitle.contains(keyword)) return false;
+          }
+          return true;
+        });
+      }
     }
 
     shownNotes.sort((a, b) {
