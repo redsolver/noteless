@@ -27,7 +27,8 @@ class _SettingsPageState extends State<SettingsPage> {
       'sync_webdav_username': '',
       'sync_webdav_password': '',
       'theme': 'light',
-      'search_content': true
+      'search_content': true,
+      'editor_mode_switcher': false
     });
     super.initState();
   }
@@ -161,6 +162,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ], '!notable_external_directory_enabled'),
         ],
+        PreferenceTitle('Editor'),
+        SwitchPreference(
+          'Use Mode Switcher',
+          'editor_mode_switcher',
+        ),
         PreferenceTitle('Search'),
         SwitchPreference(
           'Search content of notes',

@@ -9,14 +9,10 @@ import 'package:markd/markdown.dart' as markd;
 import 'package:front_matter/front_matter.dart' as fm;
 import 'package:bsdiff/bsdiff.dart';
 import 'package:notable/page/note_list.dart';
-import 'package:notable/provider/theme.dart';
+import 'package:notable/page/preview.dart';
 import 'package:notable/store/notes.dart';
 import 'package:notable/store/persistent.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:preferences/preference_service.dart';
-import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class EditPage extends StatefulWidget {
   final Note note;
@@ -35,6 +31,8 @@ class _EditPageState extends State<EditPage> {
   Note note;
 
   bool _saved = true;
+
+  bool _previewEnabled = false;
 
   @override
   void initState() {
@@ -55,6 +53,13 @@ class _EditPageState extends State<EditPage> {
     currentData = ctrl.text;
 
     _updateMaxLines();
+    if (PrefService.getBool('editor_mode_switcher') ?? false) {
+      if (PrefService.getBool('editor_mode_switcher_is_preview') ?? false) {
+        setState(() {
+          _previewEnabled = true;
+        });
+      }
+    }
   }
 
   GlobalKey<ScaffoldState> _scaffold = GlobalKey();
@@ -156,181 +161,33 @@ class _EditPageState extends State<EditPage> {
                     });
                   },
                 ),
-              IconButton(
-                icon: Icon(Icons.chrome_reader_mode),
-                onPressed: () async {
-                  final directory = await getApplicationDocumentsDirectory();
-
-                  final previewDir = Directory('${directory.path}/preview');
-
-                  const staticPreviewDir =
-                      'file:///android_asset/flutter_assets/assets/preview';
-
-                  /*  final previewAssetsDir =
-                      Directory('${directory.path}/preview/assets'); */
-
-                  final File previewFile =
-                      File('${previewDir.path}/index.html');
-                  previewFile.createSync(recursive: true);
-
-                  // TODO iOS Preview
-
-                  String content = ctrl.text;
-
-                  content = content.replaceAllMapped(
-                      RegExp(r'(?<=\]\(@note\/).*(?=\))'), (match) {
-                    return content
-                        .substring(match.start, match.end)
-                        .replaceAll(' ', '%20');
-                  });
-
-                  content = content.replaceAll(RegExp(r'\\\\'), '\\\\\\\\');
-
-                  ThemeData theme = Theme.of(context);
-
-                  String backgroundColor = theme.scaffoldBackgroundColor.value
-                      .toRadixString(16)
-                      .padLeft(8, '0')
-                      .substring(2);
-
-                  String textColor = theme.textTheme.body1.color.value
-                      .toRadixString(16)
-                      .padLeft(8, '0')
-                      .substring(2);
-
-                  String accentColor = theme.accentColor.value
-                      .toRadixString(16)
-                      .padLeft(8, '0')
-                      .substring(2);
-
-                  String generatedPreview = '''
-<!DOCTYPE html>
-<html>
-<head>
-''' +
-                      (Provider.of<ThemeNotifier>(context).currentTheme ==
-                              ThemeType.light
-                          ? ''
-                          : '''
-  <style>
-  body {
-    background-color: #$backgroundColor;
-    color: #$textColor;
-  }
-  a {
-    color: #$accentColor;
-  }
-  img {
-    filter: grayscale(20%);
-  }
-  </style>
-  ''') +
-                      '''
-
-	<link href="$staticPreviewDir/prism.css" rel="stylesheet" />
-
-  <link rel="stylesheet" href="$staticPreviewDir/katex.min.css">
-
-  <script defer src="$staticPreviewDir/katex.min.js"></script>
-
-  <script defer src="$staticPreviewDir/mhchem.min.js"></script>
-
-
-    <!-- KaTeX auto-render extension -->
-    <script defer src="$staticPreviewDir/katex.auto-render.min.js"
-        onload="renderMathInElement(document.body, 
-        {delimiters:
-        [
-          {left: '\$\$', right: '\$\$', display: true},
-          {left: '\$', right: '\$', display: false}
-        ],
-        preProcess: (math)=>math.trim()
-        });
-"></script>
-
-
-</head>
-<body>
-                      ''' +
-                      markd.markdownToHtml(
-                        content,
-                        extensionSet: markd.ExtensionSet.gitHubWeb,
-                      ) +
-                      '''
-<script src="$staticPreviewDir/mermaid.min.js"></script>
-<script>mermaid.initialize({startOnLoad:true}, ".language-mermaid");</script>
-
-
-      <script src="$staticPreviewDir/prism.js"></script>
-
-      
-  <script>
-  document.querySelectorAll(".language-mermaid").forEach(function(entry) {
-      entry.className="mermaid"
-});
-  mermaid.initialize({startOnLoad:true}, ".language-mermaid");
-  </script>
-  </body>
-  </html>''';
-                  generatedPreview = generatedPreview.replaceAll(
-                      'src="@attachment/',
-                      'src="' +
-                          'file://' +
-                          PrefService.getString(
-                              'notable_attachments_directory') +
-                          '/');
-
-                  previewFile.writeAsStringSync(generatedPreview);
-
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                          appBar: AppBar(
-                            title: Text('Preview'),
+              (PrefService.getBool('editor_mode_switcher') ?? false)
+                  ? Switch(
+                      value: _previewEnabled,
+                      activeColor: Theme.of(context).primaryIconTheme.color,
+                      onChanged: (value) {
+                        PrefService.setBool(
+                            'editor_mode_switcher_is_preview', value);
+                        setState(() {
+                          _previewEnabled = value;
+                        });
+                      },
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.chrome_reader_mode),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => Scaffold(
+                              appBar: AppBar(
+                                title: Text('Preview'),
+                              ),
+                              body: PreviewPage(store, ctrl.text),
+                            ),
                           ),
-                          body: WebView(
-                            initialUrl: 'file://' + previewFile.path,
-                            javascriptMode: JavascriptMode.unrestricted,
-                            onWebViewCreated: (ctrl) {},
-                            navigationDelegate: (request) {
-                              print(request.url);
-
-                              if (request.url.startsWith('file://')) {
-                                String link = Uri.decodeFull(
-                                    RegExp(r'@.*').stringMatch(request.url));
-                                print(link);
-
-                                String type =
-                                    RegExp(r'(?<=@).*(?=/)').stringMatch(link);
-
-                                String data =
-                                    RegExp(r'(?<=/).*').stringMatch(link);
-                                print(type);
-                                print(data);
-                                print(Theme.of(context).brightness);
-                                switch (type) {
-                                  case 'note':
-                                    _navigateToNote(data);
-
-                                    break;
-                                  case 'tag':
-                                    _navigateToTag(data);
-                                    break;
-                                  case 'search':
-                                    _navigateToSearch(data);
-                                    break;
-                                  case 'attachment':
-                                    break;
-                                }
-                              } else {
-                                launch(
-                                  request.url,
-                                );
-                              }
-                              return NavigationDecision.prevent;
-                            },
-                          ))));
-                },
-              ),
+                        );
+                      },
+                    ),
               PopupMenuButton<String>(
                 onSelected: (String result) async {
                   int divIndex = result.indexOf('.');
@@ -559,133 +416,139 @@ class _EditPageState extends State<EditPage> {
           child: */
               ctrl == null
                   ? LinearProgressIndicator()
-                  : Column(
-                      children: <Widget>[
-                        Expanded(
-                          /* 
+                  : _previewEnabled
+                      ? PreviewPage(store, ctrl.text)
+                      : Column(
+                          children: <Widget>[
+                            Expanded(
+                              /* 
                           fit: FlexFit.tight, */
-                          child: Scrollbar(
-                            child: SingleChildScrollView(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: TextField(
-                                  scrollPhysics: NeverScrollableScrollPhysics(),
-                                  controller: ctrl,
-                                  style: TextStyle(
-                                      fontFamily: 'FiraMono',
-                                      fontFamilyFallback: ['monospace']),
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding:
-                                          const EdgeInsets.all(0.0)),
-                                  scrollPadding: const EdgeInsets.all(0.0),
-                                  /*  autofocus: true, */
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  onChanged: (str) {
-                                    print('change!');
+                              child: Scrollbar(
+                                child: SingleChildScrollView(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextField(
+                                      scrollPhysics:
+                                          NeverScrollableScrollPhysics(),
+                                      controller: ctrl,
+                                      style: TextStyle(
+                                          fontFamily: 'FiraMono',
+                                          fontFamilyFallback: ['monospace']),
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              const EdgeInsets.all(0.0)),
+                                      scrollPadding: const EdgeInsets.all(0.0),
+                                      /*  autofocus: true, */
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: null,
+                                      onChanged: (str) {
+                                        print('change!');
 
-                                    var diff = bsdiff(utf8.encode(str),
-                                        utf8.encode(currentData));
-                                    history.add(diff);
-                                    if (history.length == 1) {
-                                      // First entry
-                                      setState(() {});
-                                    } else if (history.length > 1000) {
-                                      // First entry
-                                      history.removeAt(0);
-                                    }
+                                        var diff = bsdiff(utf8.encode(str),
+                                            utf8.encode(currentData));
+                                        history.add(diff);
+                                        if (history.length == 1) {
+                                          // First entry
+                                          setState(() {});
+                                        } else if (history.length > 1000) {
+                                          // First entry
+                                          history.removeAt(0);
+                                        }
 
-                                    currentData = str;
-                                    if (_saved)
-                                      setState(() {
-                                        _saved = false;
-                                      });
-                                  },
+                                        currentData = str;
+                                        if (_saved)
+                                          setState(() {
+                                            _saved = false;
+                                          });
+                                      },
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        Container(
-                          height: 32,
-                          color: Theme.of(context).dividerColor,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: Row(
-                              children: <Widget>[
-                                Flexible(
-                                  fit: FlexFit.tight,
-                                  child: SizedBox(
-                                    height: double.infinity,
-                                    child: InkWell(
-                                      child: Icon(
-                                        Icons.check_box_outline_blank,
+                            Container(
+                              height: 32,
+                              color: Theme.of(context).dividerColor,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: Row(
+                                  children: <Widget>[
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.check_box_outline_blank,
+                                          ),
+                                          onTap: () {
+                                            _scaffold.currentState
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Not implemented'),
+                                            ));
+                                          },
+                                        ),
                                       ),
-                                      onTap: () {
-                                        _scaffold.currentState
-                                            .showSnackBar(SnackBar(
-                                          content: Text('Not implemented'),
-                                        ));
-                                      },
                                     ),
-                                  ),
-                                ),
-                                Flexible(
-                                  fit: FlexFit.tight,
-                                  child: SizedBox(
-                                    height: double.infinity,
-                                    child: InkWell(
-                                      child: Icon(
-                                        Icons.check_box_outline_blank,
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.check_box_outline_blank,
+                                          ),
+                                          onTap: () {
+                                            _scaffold.currentState
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Not implemented'),
+                                            ));
+                                          },
+                                        ),
                                       ),
-                                      onTap: () {
-                                        _scaffold.currentState
-                                            .showSnackBar(SnackBar(
-                                          content: Text('Not implemented'),
-                                        ));
-                                      },
                                     ),
-                                  ),
-                                ),
-                                /* 
+                                    /* 
                                 if (history.isNotEmpty) */
-                                Flexible(
-                                  fit: FlexFit.tight,
-                                  child: SizedBox(
-                                    height: double.infinity,
-                                    child: InkWell(
-                                      child: Icon(
-                                        Icons.undo,
-                                        color: history.isEmpty
-                                            ? Colors.grey
-                                            : null,
-                                      ),
-                                      onTap: history.isEmpty
-                                          ? null
-                                          : () {
-                                              currentData = utf8.decode(bspatch(
-                                                  utf8.encode(currentData),
-                                                  history.removeLast()));
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.undo,
+                                            color: history.isEmpty
+                                                ? Colors.grey
+                                                : null,
+                                          ),
+                                          onTap: history.isEmpty
+                                              ? null
+                                              : () {
+                                                  currentData = utf8.decode(
+                                                      bspatch(
+                                                          utf8.encode(
+                                                              currentData),
+                                                          history
+                                                              .removeLast()));
 
-                                              ctrl.text = currentData;
-                                              if (history.isEmpty) {
-                                                setState(() {});
-                                              }
-                                              if (_saved)
-                                                setState(() {
-                                                  _saved = false;
-                                                });
-                                            },
+                                                  ctrl.text = currentData;
+                                                  if (history.isEmpty) {
+                                                    setState(() {});
+                                                  }
+                                                  if (_saved)
+                                                    setState(() {
+                                                      _saved = false;
+                                                    });
+                                                },
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    )),
+                              ),
+                            )
+                          ],
+                        )),
     );
   }
 
@@ -702,33 +565,5 @@ class _EditPageState extends State<EditPage> {
         maxLines = newMaxLines;
       });
     }
-  }
-
-  void _navigateToNote(String title) async {
-    if (!title.endsWith('.md')) title += '.md';
-    Note newNote = await PersistentStore.readNote(
-        File('${PrefService.getString('notable_notes_directory')}/${title}'));
-    if (newNote == null) {
-      // TODO Show Error
-    } else {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => EditPage(newNote, store)));
-    }
-  }
-
-  void _navigateToTag(String tag) async {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => NoteListPage(
-              filterTag: tag,
-              isFirstPage: false,
-            )));
-  }
-
-  void _navigateToSearch(String search) async {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => NoteListPage(
-              searchText: search,
-              isFirstPage: false,
-            )));
   }
 }

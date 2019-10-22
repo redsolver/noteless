@@ -1,5 +1,9 @@
 # Changelog
 
+## master
+
+- Added option to use a mode switcher for editor and preview
+
 ## 0.1.5
 
 - Added feature to add and remove attachments
