@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 0.1.6
 
 - Added option to use a mode switcher for editor and preview
 
