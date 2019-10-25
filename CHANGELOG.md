@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 0.1.7
 
 - Fixed white flash when loading note preview
 

@@ -28,6 +28,10 @@ This app is UNOFFICIAL.
 
 ## Changelog
 
+### 0.1.7
+
+- Fixed white flash when loading note preview
+
 ### 0.1.6
 
 - Added option to use a mode switcher for editor and preview
