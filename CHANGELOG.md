@@ -1,5 +1,9 @@
 # Changelog
 
+## master
+
+- Fixed white flash when loading note preview
+
 ## 0.1.6
 
 - Added option to use a mode switcher for editor and preview

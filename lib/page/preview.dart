@@ -123,7 +123,7 @@ class PreviewPage extends StatelessWidget {
 <script>mermaid.initialize({startOnLoad:true}, ".language-mermaid");</script>
 
 
-      <script src="$staticPreviewDir/prism.js"></script>
+<script src="$staticPreviewDir/prism.js"></script>
 
       
   <script>
@@ -132,6 +132,13 @@ class PreviewPage extends StatelessWidget {
 });
   mermaid.initialize({startOnLoad:true}, ".language-mermaid");
   </script>
+
+<script>
+ window.addEventListener('load', function () {
+        flutternotable.postMessage('');
+});
+</script>
+
   </body>
   </html>''';
     generatedPreview = generatedPreview.replaceAll(
@@ -143,46 +150,71 @@ class PreviewPage extends StatelessWidget {
 
     previewFile.writeAsStringSync(generatedPreview);
 
-    return  WebView(
-          initialUrl: 'file://' + previewFile.path,
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (ctrl) {},
-          navigationDelegate: (request) {
-            print(request.url);
+    bool _pageLoaded = false;
 
-            if (request.url.startsWith('file://')) {
-              String link =
-                  Uri.decodeFull(RegExp(r'@.*').stringMatch(request.url));
-              print(link);
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Stack(
+          children: <Widget>[
+            WebView(
+              initialUrl: 'file://' + previewFile.path,
+              javascriptMode: JavascriptMode.unrestricted,
+              onWebViewCreated: (ctrl) {},
+              javascriptChannels: {
+                JavascriptChannel(
+                    name: 'flutternotable',
+                    onMessageReceived: (_) async {
+                      setState(() {
+                        _pageLoaded = true;
+                      });
+                    })
+              },
+              navigationDelegate: (request) {
+                print(request.url);
 
-              String type = RegExp(r'(?<=@).*(?=/)').stringMatch(link);
+                if (request.url.startsWith('file://')) {
+                  String link =
+                      Uri.decodeFull(RegExp(r'@.*').stringMatch(request.url));
+                  print(link);
 
-              String data = RegExp(r'(?<=/).*').stringMatch(link);
-              print(type);
-              print(data);
-              print(Theme.of(context).brightness);
-              switch (type) {
-                case 'note':
-                  _navigateToNote(data);
+                  String type = RegExp(r'(?<=@).*(?=/)').stringMatch(link);
 
-                  break;
-                case 'tag':
-                  _navigateToTag(data);
-                  break;
-                case 'search':
-                  _navigateToSearch(data);
-                  break;
-                case 'attachment':
-                  break;
-              }
-            } else {
-              launch(
-                request.url,
-              );
-            }
-            return NavigationDecision.prevent;
-          },
+                  String data = RegExp(r'(?<=/).*').stringMatch(link);
+                  print(type);
+                  print(data);
+                  print(Theme.of(context).brightness);
+                  switch (type) {
+                    case 'note':
+                      _navigateToNote(data);
+
+                      break;
+                    case 'tag':
+                      _navigateToTag(data);
+                      break;
+                    case 'search':
+                      _navigateToSearch(data);
+                      break;
+                    case 'attachment':
+                      break;
+                  }
+                } else {
+                  launch(
+                    request.url,
+                  );
+                }
+                return NavigationDecision.prevent;
+              },
+            ),
+            if (!_pageLoaded)
+              Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              ),
+          ],
         );
+      },
+    );
   }
 
   void _navigateToNote(String title) async {
