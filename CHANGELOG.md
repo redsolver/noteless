@@ -1,5 +1,11 @@
 # Changelog
 
+## master
+
+- Added options to restore notes from trash
+  - With the swipe actions of a note
+  - With the "Restore from trash" button in the multi select options
+
 ## 0.1.7
 
 - Fixed white flash when loading note preview

@@ -312,7 +312,7 @@ class _NoteListPageState extends State<NoteListPage> {
                         Slidable(
                           actionPane: SlidableDrawerActionPane(),
                           actions: <Widget>[
-                            if (note.deleted)
+                            if (note.deleted) ...[
                               IconSlideAction(
                                 caption: 'Delete',
                                 color: Colors.red,
@@ -350,6 +350,19 @@ class _NoteListPageState extends State<NoteListPage> {
                                   }
                                 },
                               ),
+                              IconSlideAction(
+                                caption: 'Restore',
+                                color: Colors.redAccent,
+                                icon: MdiIcons.deleteRestore,
+                                onTap: () async {
+                                  note.deleted = false;
+
+                                  PersistentStore.saveNote(note);
+
+                                  await _filterAndSortNotes();
+                                },
+                              ),
+                            ],
                             if (!note.deleted)
                               IconSlideAction(
                                 caption: 'Trash',
@@ -767,6 +780,17 @@ class _NoteListPageState extends State<NoteListPage> {
                                             onTap: () =>
                                                 _modifyAll((Note note) {
                                               note.deleted = true;
+
+                                              PersistentStore.saveNote(note);
+                                            }),
+                                          ),
+                                          ListTile(
+                                            leading:
+                                                Icon(MdiIcons.deleteRestore),
+                                            title: Text('Restore from trash'),
+                                            onTap: () =>
+                                                _modifyAll((Note note) {
+                                              note.deleted = false;
 
                                               PersistentStore.saveNote(note);
                                             }),
