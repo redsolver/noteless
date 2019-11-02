@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:preferences/preference_service.dart';
 import 'package:yamlicious/yamlicious.dart';
 import 'package:front_matter/front_matter.dart' as fm;
 
@@ -7,7 +8,7 @@ import 'package:notable/model/note.dart';
 
 class PersistentStore {
   static Future saveNote(Note note, [String content]) async {
-   // print('PersistentStore.saveNote');
+    // print('PersistentStore.saveNote');
 
     if (content == null) {
       content = fm.parse(note.file.readAsStringSync()).content;
@@ -17,6 +18,10 @@ class PersistentStore {
     Map data = {};
 
     data['title'] = note.title;
+
+    if (PrefService.getBool('notes_list_virtual_tags') ?? false) {
+      note.tags.removeWhere((s) => s.startsWith('#/'));
+    }
 
     if (note.tags.isNotEmpty) data['tags'] = note.tags;
     if (note.attachments.isNotEmpty) data['attachments'] = note.attachments;
@@ -32,14 +37,14 @@ class PersistentStore {
 
     header += '\n---\n\n';
 
-   // print(header);
+    // print(header);
 
     note.file.writeAsStringSync(header + content);
     /*  print(header + content); */
   }
 
   static Future<Note> readNote(File file) async {
-   // print('PersistentStore.readNote');
+    // print('PersistentStore.readNote');
 
     if (!file.existsSync()) return null;
 

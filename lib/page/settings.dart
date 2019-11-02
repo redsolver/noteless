@@ -28,7 +28,8 @@ class _SettingsPageState extends State<SettingsPage> {
       'sync_webdav_password': '',
       'theme': 'light',
       'search_content': true,
-      'editor_mode_switcher': false
+      'editor_mode_switcher': false,
+      'notes_list_virtual_tags': false
     });
     super.initState();
   }
@@ -254,6 +255,13 @@ class _SettingsPageState extends State<SettingsPage> {
               await store.updateTagList();
             }
           },
+        ),
+        PreferenceTitle('Experimental'),
+        SwitchPreference(
+          'Show virtual tags',
+          'notes_list_virtual_tags',
+          desc:
+              'Adds a virtual tag (#/path) to notes which are in a subdirectory',
         ),
       ]),
     );

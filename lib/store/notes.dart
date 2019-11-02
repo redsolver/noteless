@@ -80,15 +80,27 @@ class NotesStore {
 
     allNotes = [];
 
-    await for (var entity in notesDir.list()) {
+    await _listNotesInFolder('');
+
+    // _updateTagList();
+  }
+
+  Future _listNotesInFolder(String dir, [bool isSubDirectory = false]) async {
+    await for (var entity in Directory('${notesDir.path}$dir').list()) {
       if (entity is File) {
         Note note = await PersistentStore.readNote(entity);
 
-        if (note != null) allNotes.add(note);
+        if (note != null) {
+          if (PrefService.getBool('notes_list_virtual_tags') ?? false) {
+            if (isSubDirectory) note.tags.add('#$dir');
+          }
+
+          allNotes.add(note);
+        }
+      } else if (entity is Directory) {
+        await _listNotesInFolder(dir + '/' + entity.path.split('/').last, true);
       }
     }
-
-    // _updateTagList();
   }
 
   updateTagList() {

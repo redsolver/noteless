@@ -2,9 +2,11 @@
 
 ## master
 
+- Added support for subdirectories
 - Added options to restore notes from trash
   - With the swipe actions of a note
   - With the "Restore from trash" button in the multi select options
+- Added experimental option to enable virtual folder tags
 
 ## 0.1.7
 
