@@ -1,14 +1,19 @@
+import 'dart:core' hide writeDebugLine;
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
+import 'package:notable/model/note.dart';
+import 'package:notable/store/notes.dart';
+import 'package:notable/store/persistent.dart';
 import 'package:preferences/preferences.dart';
 import 'package:webdav/webdav.dart';
 import 'package:webdav/src/client.dart';
 import 'package:intl/intl.dart';
 
 class WebdavSync {
-  Future<String> syncFiles() async {
+  Future<String> syncFiles(NotesStore store) async {
+    debugOutput = '';
     Client client = Client(
         PrefService.getString('sync_webdav_host') ?? '',
         PrefService.getString('sync_webdav_username') ?? '',
@@ -21,15 +26,40 @@ class WebdavSync {
       await syncDirectory(client, '/notable/notes/', 'notes');
       await syncDirectory(client, '/notable/attachments/', 'attachments');
     } catch (e, st) {
-      print(e);
-      print(st);
+      writeDebugLine(e);
+      writeDebugLine(st);
       if (e is WebDavException) {
         return e.cause;
       } else {
         return e.toString();
       }
     }
+
+    if (PrefService.getBool('debug_logs_sync') ?? false) {
+      Note logNote = Note();
+      logNote.title = '[DEBUG] Sync';
+
+      logNote.created = DateTime.now();
+      logNote.modified = logNote.created;
+
+      logNote.tags.add('debug');
+
+      logNote.file = File('${store.notesDir.path}/${logNote.title}.md');
+
+      await PersistentStore.saveNote(
+          logNote,
+          '# ${logNote.title}\n\n${DateTime.now().toIso8601String()}\n\n' +
+              debugOutput);
+    }
     return null;
+  }
+
+  String debugOutput;
+
+  writeDebugLine(var o) {
+    if (PrefService.getBool('debug_logs_sync') ?? false) {
+      debugOutput += o.toString() + '\n';
+    }
   }
 
   Future syncDirectory(Client client, String path, String dir) async {
@@ -37,8 +67,8 @@ class WebdavSync {
 
     List<FileInfo> noteFiles = await client.ls('$path');
 
-    print('SYNCSYNCSYNC $path');
-    print(noteFiles);
+    writeDebugLine('SYNC $path');
+    writeDebugLine('${noteFiles.length} files');
 
     final directory = Directory(PrefService.getString('notable_directory'));
 
@@ -51,20 +81,20 @@ class WebdavSync {
     }
 
     Map localSyncTimestamps = json.decode(timestampFile.readAsStringSync());
-    print(localSyncTimestamps);
+    writeDebugLine('localSyncTimestamps: $localSyncTimestamps');
 
     List syncedNotes = [];
 
     for (FileInfo info in noteFiles) {
-      print('----');
+      writeDebugLine('----');
 
-      print(info.name);
-      print(info.contentType);
-      print(info.ctime);
-      print(info.mtime);
+      writeDebugLine(info.name);
+      writeDebugLine(info.contentType);
+      writeDebugLine(info.ctime);
+      writeDebugLine(info.mtime);
 
       String name = Uri.decodeFull(info.name).split('/').last;
-      print(name);
+      writeDebugLine(name);
       if (name.trim().isEmpty) continue;
 
       syncedNotes.add(name);
@@ -75,12 +105,11 @@ class WebdavSync {
       File localFile = File(localFilePath);
       DateTime lastModifiedServer = format.parse(info.mtime, true);
 
-      print('LMS $lastModifiedServer');
+      writeDebugLine('LMS $lastModifiedServer');
 
       if (!localFile.existsSync()) {
-        print('File doesnt exist local');
+        writeDebugLine('File does nott exist locally -> DOWNLOAD');
         // DOWNLOAD
-        print('DOWNLOAD');
         client.download('$path${name}', localFilePath);
         localSyncTimestamps[name] = lastModifiedServer.toIso8601String();
       } else {
@@ -99,24 +128,24 @@ class WebdavSync {
           lastModifiedClient = lastModifiedClientFile;
         }
 
-        print('lastModifiedServer');
-        print(lastModifiedServer);
-        print('lastModifiedClient');
-        print(lastModifiedClient);
+        writeDebugLine('lastModifiedServer');
+        writeDebugLine(lastModifiedServer);
+        writeDebugLine('lastModifiedClient');
+        writeDebugLine(lastModifiedClient);
 
-        print(lastModifiedClient.difference(lastModifiedServer));
+        writeDebugLine(lastModifiedClient.difference(lastModifiedServer));
         if (lastModifiedServer.difference(lastModifiedClient).abs().inSeconds <
             3) {
-          print('FILE MATCH!');
+          writeDebugLine('FILE MATCH!');
         } else if (lastModifiedServer.isBefore(lastModifiedClient)) {
           // UPLOAD
-          print('UPLOAD');
+          writeDebugLine('UPLOAD');
           client.uploadFile(localFilePath, '$path${name}');
 
           localSyncTimestamps[name] = DateTime.now().toIso8601String();
         } else if (lastModifiedServer.isAfter(lastModifiedClient)) {
           // DOWNLOAD
-          print('DOWNLOAD');
+          writeDebugLine('DOWNLOAD');
           client.download('$path${name}', localFilePath);
           localSyncTimestamps[name] = lastModifiedServer.toIso8601String();
         }
@@ -124,15 +153,14 @@ class WebdavSync {
         // _upload();
       }
     }
-    print(syncedNotes);
+    writeDebugLine(syncedNotes);
 
     for (var entity in fileDir.listSync()) {
       if (entity is! File) continue;
       String name = entity.uri.pathSegments.last;
-      print(entity);
+      writeDebugLine(entity);
       if (!syncedNotes.contains(name)) {
-        print('DOESNT EXIST ON SERVER $entity');
-        print('UPLOAD');
+        writeDebugLine('DOESNT EXIST ON SERVER $entity -> UPLOAD');
         client.uploadFile(entity.path, '$path${name}');
         localSyncTimestamps[name] = DateTime.now().toIso8601String();
       }

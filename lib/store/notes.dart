@@ -220,7 +220,7 @@ class NotesStore {
   Future<String> syncNow() async {
     switch (syncMethod) {
       case 'webdav':
-        return await WebdavSync().syncFiles();
+        return await WebdavSync().syncFiles(this);
     }
     return null;
   }

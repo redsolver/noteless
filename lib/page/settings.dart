@@ -29,7 +29,8 @@ class _SettingsPageState extends State<SettingsPage> {
       'theme': 'light',
       'search_content': true,
       'editor_mode_switcher': false,
-      'notes_list_virtual_tags': false
+      'notes_list_virtual_tags': false,
+      'debug_logs_sync': false
     });
     super.initState();
   }
@@ -255,6 +256,11 @@ class _SettingsPageState extends State<SettingsPage> {
               await store.updateTagList();
             }
           },
+        ),
+        PreferenceTitle('Debug'),
+        SwitchPreference(
+          'Create sync logfile ',
+          'debug_logs_sync',
         ),
         PreferenceTitle('Experimental'),
         SwitchPreference(
