@@ -28,6 +28,8 @@ class ThemeNotifier with ChangeNotifier {
           currentTheme == ThemeType.light ? Brightness.light : Brightness.dark,
       accentColor: _accentColor,
       primaryColor: _accentColor,
+      toggleableActiveColor: _accentColor,
+      highlightColor: _accentColor,
       buttonColor: _accentColor,
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: _accentColor,

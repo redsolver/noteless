@@ -8,6 +8,7 @@
   - With the "Restore from trash" button in the multi select options
 - Added option to create a logfile for sync 
 - Added experimental option to enable virtual folder tags
+- Minor theme fixes
 
 ## 0.1.7
 
