@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 0.1.8
 
 - Added support for subdirectories
 - Added options to restore notes from trash

@@ -28,6 +28,16 @@ This app is UNOFFICIAL.
 
 ## Changelog
 
+### 0.1.8
+
+- Added support for subdirectories
+- Added options to restore notes from trash
+  - With the swipe actions of a note
+  - With the "Restore from trash" button in the multi select options
+- Added option to create a logfile for sync 
+- Added experimental option to enable virtual folder tags
+- Minor theme fixes
+
 ### 0.1.7
 
 - Fixed white flash when loading note preview
