@@ -14,17 +14,27 @@ import 'package:intl/intl.dart';
 class WebdavSync {
   Future<String> syncFiles(NotesStore store) async {
     debugOutput = '';
+    var hostUri = Uri.parse('https://' + PrefService.getString('sync_webdav_host') ?? '');
+    var hostPath = hostUri.path;
+    if (hostPath.startsWith('/')) {
+      hostPath = hostPath.substring(1);
+    }
+    if (hostPath.endsWith('/')) {
+      hostPath = hostPath.substring(0, hostPath.length - 1);
+    }
     Client client = Client(
-        PrefService.getString('sync_webdav_host') ?? '',
+        hostUri.host,
         PrefService.getString('sync_webdav_username') ?? '',
         PrefService.getString('sync_webdav_password') ?? '',
-        PrefService.getString('sync_webdav_path') ?? '',
+        hostPath,
         port: 443,
         protocol: 'https');
+
     try {
-      await client.mkdir('/notable/');
-      await syncDirectory(client, '/notable/notes/', 'notes');
-      await syncDirectory(client, '/notable/attachments/', 'attachments');
+      var path = PrefService.getString('sync_webdav_path');
+      client.mkdirs(path);
+      await syncDirectory(client, '$path/notes/', 'notes');
+      await syncDirectory(client, '$path/attachments/', 'attachments');
     } catch (e, st) {
       writeDebugLine(e);
       writeDebugLine(st);
@@ -86,6 +96,10 @@ class WebdavSync {
     List syncedNotes = [];
 
     for (FileInfo info in noteFiles) {
+      if (info.isDict) {
+        continue;
+      }
+
       writeDebugLine('----');
 
       writeDebugLine(info.name);
@@ -108,7 +122,7 @@ class WebdavSync {
       writeDebugLine('LMS $lastModifiedServer');
 
       if (!localFile.existsSync()) {
-        writeDebugLine('File does nott exist locally -> DOWNLOAD');
+        writeDebugLine('File does not exist locally -> DOWNLOAD');
         // DOWNLOAD
         client.download('$path${name}', localFilePath);
         localSyncTimestamps[name] = lastModifiedServer.toIso8601String();
