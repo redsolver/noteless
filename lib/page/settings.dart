@@ -209,12 +209,12 @@ class _SettingsPageState extends State<SettingsPage> {
               TextFieldPreference(
                 'Host',
                 'sync_webdav_host',
-                hintText: 'mynextcloud.tld',
+                hintText: 'mynextcloud.tld/remote.php/webdav/',
               ),
               TextFieldPreference(
                 'Path',
                 'sync_webdav_path',
-                hintText: 'remote.php/webdav/',
+                hintText: 'notable',
               ),
               TextFieldPreference('Username', 'sync_webdav_username'),
               TextFieldPreference(
