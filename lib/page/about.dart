@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notable/store/notes.dart';
+import 'package:app/store/notes.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info/package_info.dart';
 
@@ -42,14 +42,10 @@ class _AboutPageState extends State<AboutPage> {
             SizedBox(
               height: 16,
             ),
-            Text('This app is unofficial'),
-            SizedBox(
-              height: 16,
-            ),
             RaisedButton(
               child: Text('GitHub Repo'),
               onPressed: () {
-                launch('https://github.com/redsolver/notable-mobile');
+                launch('https://github.com/redsolver/noteless');
               },
             ),
           ],

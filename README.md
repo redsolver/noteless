@@ -1,10 +1,20 @@
-# Notable Mobile
+# Noteless
 
-This app is UNOFFICIAL.
+A markdown note-taking app for mobile devices (Android only at the moment, iOS is planned).
+
+Compatible with notes saved in [Notable](https://notable.app/)
 
 ## Download
 
-[https://github.com/redsolver/notable-mobile/releases](https://github.com/redsolver/notable-mobile/releases)
+[https://github.com/redsolver/noteless/releases](https://github.com/redsolver/noteless/releases)
+
+## Important Changes in Version 0.2.0 
+
+The app has been renamed from `Notable Mobile` to `Noteless` on 02.07.2020.
+
+If you used an earlier Alpha Version, you need to uninstall the old one and install one of the new APKs (Don't forget to backup your notes!)
+
+This is because the app also has a new package name: `net.redsolver.noteless`.
 
 ## Screenshots
 

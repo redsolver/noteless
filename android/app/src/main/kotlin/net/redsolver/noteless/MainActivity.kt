@@ -1,4 +1,4 @@
-package net.redsolver.notable
+package net.redsolver.noteless
 
 import android.os.Bundle
 

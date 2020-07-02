@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.redsolver.notable">
+    package="net.redsolver.noteless">
     
     <uses-permission android:name="android.permission.INTERNET"/>
+    
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -13,7 +16,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Notable"
+        android:label="Noteless"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
