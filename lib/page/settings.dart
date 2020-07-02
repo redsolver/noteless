@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:directory_picker/directory_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:notable/provider/theme.dart';
-import 'package:notable/store/notes.dart';
+import 'package:app/provider/theme.dart';
+import 'package:app/store/notes.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:preferences/preferences.dart';
 import 'package:preferences/radio_preference.dart';
@@ -49,7 +49,8 @@ class _SettingsPageState extends State<SettingsPage> {
           'theme',
           isDefault: true,
           onSelect: () {
-            Provider.of<ThemeNotifier>(context).updateTheme('light');
+            Provider.of<ThemeNotifier>(context, listen: false)
+                .updateTheme('light');
           },
         ),
         RadioPreference(
@@ -57,7 +58,8 @@ class _SettingsPageState extends State<SettingsPage> {
           'dark',
           'theme',
           onSelect: () {
-            Provider.of<ThemeNotifier>(context).updateTheme('dark');
+            Provider.of<ThemeNotifier>(context, listen: false)
+                .updateTheme('dark');
           },
         ),
         ListTile(
@@ -67,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(),
-                color: Color(PrefService.getInt('theme_color') ?? 0xfff5b746),
+                color: Color(PrefService.getInt('theme_color') ?? 0xff21d885),
               ),
               child: SizedBox(
                 width: 28,
@@ -85,7 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           crossAxisCount: 5,
                           children: [
                             for (Color color in [
-                              Color(0xfff5b746),
+                              Color(0xff21d885),
                               ...Colors.primaries,
                               ...Colors.accents,
                             ])
@@ -113,7 +115,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     ));
             if (color != null) {
               PrefService.setInt('theme_color', color.value);
-              Provider.of<ThemeNotifier>(context).accentColor = color;
+
+              Provider.of<ThemeNotifier>(context, listen: false).accentColor =
+                  color;
             }
           },
         ),
@@ -152,6 +156,16 @@ class _SettingsPageState extends State<SettingsPage> {
                         : (await getExternalStorageDirectory()));
                 print(newDirectory);
                 if (newDirectory != null) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: ListTile(
+                        leading: CircularProgressIndicator(),
+                        title: Text('Processing files...'),
+                      ),
+                    ),
+                    barrierDismissible: false,
+                  );
                   PrefService.setString(
                       'notable_external_directory', newDirectory.path);
 
@@ -159,6 +173,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   await store.filterAndSortNotes();
                   await store.updateTagList();
                   setState(() {});
+                  Navigator.of(context).pop();
                 }
               },
             ),
@@ -202,7 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'Warning: Webdav Sync isn\'t stable! Please do NOT use it for important data or accounts!',
+                  'WARNING: WebDav Sync is not supported! Please use another app to sync if possible (Syncthing is recommended) and do NOT use it for important data or accounts! ',
                   style: TextStyle(color: Colors.red),
                 ),
               ),
