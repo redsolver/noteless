@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:preferences/preference_service.dart';
 import 'package:yamlicious/yamlicious.dart';
 import 'package:front_matter/front_matter.dart' as fm;
 
-import 'package:notable/model/note.dart';
+import 'package:app/model/note.dart';
 
 class PersistentStore {
   static Future saveNote(Note note, [String content]) async {
@@ -85,6 +86,74 @@ class PersistentStore {
 
     return note;
   }
+
+/*   static Future<Note> readNoteMetadata(File file) async {
+    // print('PersistentStore.readNote');
+
+    if (!file.existsSync()) return null;
+
+    var raf = await file.open();
+
+    List<int> bytes = [];
+
+    bool equalBytes(List<int> l1, List<int> l2) {
+      int i = -1;
+      return l1.every((val) {
+        i++;
+        return l2[i] == val;
+      });
+    }
+
+    while (true) {
+      var byte = raf.readByteSync();
+      if (byte == -1) break;
+
+      bytes.add(byte);
+
+      int length = bytes.length;
+
+      if (length > 6 &&
+          equalBytes(bytes.sublist(bytes.length - 4, bytes.length),
+              <int>[10, 45, 45, 45] /* == "\n---" */)) break;
+    }
+
+    String fileContent = utf8.decode(bytes);
+
+    var doc = fm.parse(fileContent);
+/* 
+        String headerString = fileContent.split('---')[1]; */
+
+    var header = doc.data /* loadYaml(headerString) */;
+
+    if (header == null) return null;
+
+    // TODO Better Error Handling for unexpected Layout
+    /* for (String line in headerString.split('\n')) {
+          if (line.trim().length == 0) continue;
+          print(line);
+          String key=line.split(':').first;
+          header[key] = line.sub;
+        } */
+    //print(header);
+    Note note = Note();
+
+    note.file = file;
+
+    note.title = header['title'];
+    note.created = DateTime.parse(header['created']);
+    note.modified = DateTime.parse(header['modified']);
+    /* 
+        note.tags =
+            (header['tags'] as YamlList).map((s) => s.toString()).toList(); */
+    note.tags = List.from((header['tags'] ?? []).cast<String>());
+    note.attachments = List.from((header['attachments'] ?? []).cast<String>());
+
+    note.pinned = header['pinned'] ?? false;
+    note.favorited = header['favorited'] ?? false;
+    note.deleted = header['deleted'] ?? false;
+
+    return note;
+  } */
 
   static Future deleteNote(Note note) async {
     await note.file.delete();
