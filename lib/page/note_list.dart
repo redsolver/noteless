@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:notable/model/note.dart';
-import 'package:notable/page/edit.dart';
-import 'package:notable/page/settings.dart';
-import 'package:notable/store/notes.dart';
-import 'package:notable/store/persistent.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:app/model/note.dart';
+import 'package:app/page/edit.dart';
+import 'package:app/page/settings.dart';
+import 'package:app/store/notes.dart';
+import 'package:app/store/persistent.dart';
 import 'package:preferences/preferences.dart';
-import 'package:yaml/yaml.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'about.dart';
@@ -162,6 +160,7 @@ class _NoteListPageState extends State<NoteListPage> {
             child: searching
                 ? TextField(
                     decoration: InputDecoration(
+                      isDense: true,
                       labelText: 'Search',
                       labelStyle: TextStyle(color: searchFieldColor),
                       focusedBorder: OutlineInputBorder(
@@ -184,7 +183,7 @@ class _NoteListPageState extends State<NoteListPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('Notable Alpha'),
+                      Text('Noteless Alpha'),
                       if (store.currentTag.length > 0)
                         Text(
                           store.currentTag,
@@ -309,163 +308,175 @@ class _NoteListPageState extends State<NoteListPage> {
                         color: Colors.grey.shade300,
                       ),
                       for (Note note in store.shownNotes)
-                        Slidable(
-                          actionPane: SlidableDrawerActionPane(),
-                          actions: <Widget>[
-                            if (note.deleted) ...[
-                              IconSlideAction(
-                                caption: 'Delete',
-                                color: Colors.red,
-                                icon: Icons.delete_forever,
-                                onTap: () async {
-                                  if (await showDialog(
-                                          context: context,
-                                          child: AlertDialog(
-                                            title: Text(
-                                                'Do you really want to delete this note?'),
-                                            content: Text(
-                                                'This will delete it permanently.'),
-                                            actions: <Widget>[
-                                              FlatButton(
-                                                child: Text('Cancel'),
-                                                onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(false);
-                                                },
-                                              ),
-                                              FlatButton(
-                                                child: Text('Delete'),
-                                                onPressed: () {
-                                                  Navigator.of(context)
-                                                      .pop(true);
-                                                },
-                                              )
-                                            ],
-                                          )) ??
-                                      false) {
-                                    store.allNotes.remove(note);
-                                    PersistentStore.deleteNote(note);
-
-                                    await _filterAndSortNotes();
-                                  }
-                                },
-                              ),
-                              IconSlideAction(
-                                caption: 'Restore',
-                                color: Colors.redAccent,
-                                icon: MdiIcons.deleteRestore,
-                                onTap: () async {
-                                  note.deleted = false;
-
-                                  PersistentStore.saveNote(note);
-
-                                  await _filterAndSortNotes();
-                                },
-                              ),
-                            ],
-                            if (!note.deleted)
-                              IconSlideAction(
-                                caption: 'Trash',
-                                color: Colors.red,
-                                icon: Icons.delete,
-                                onTap: () async {
-                                  note.deleted = true;
-
-                                  PersistentStore.saveNote(note);
-
-                                  await _filterAndSortNotes();
-                                },
-                              ),
-                          ],
-                          secondaryActions: <Widget>[
-                            IconSlideAction(
-                              caption: note.favorited ? 'Unstar' : 'Star',
-                              color: Colors.yellow,
-                              icon: note.favorited
-                                  ? MdiIcons.starOff
-                                  : MdiIcons.star,
-                              onTap: () async {
-                                note.favorited = !note.favorited;
-
-                                PersistentStore.saveNote(note);
-
-                                await _filterAndSortNotes();
-                              },
-                            ),
-                            IconSlideAction(
-                              caption: note.pinned ? 'Unpin' : 'Pin',
-                              color: Colors.green,
-                              icon:
-                                  note.pinned ? MdiIcons.pinOff : MdiIcons.pin,
-                              onTap: () async {
-                                note.pinned = !note.pinned;
-
-                                PersistentStore.saveNote(note);
-
-                                await _filterAndSortNotes();
-                              },
-                            ),
-                          ],
-                          child: ListTile(
-                            selected: _selectedNotes.contains(note.title),
-                            title: Text(note.title),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                if (note.attachments.isNotEmpty)
-                                  Icon(MdiIcons.paperclip),
-                                if (note.favorited) Icon(MdiIcons.star),
-                                if (note.pinned) Icon(MdiIcons.pin),
-                                if (note.tags.contains('color/red'))
-                                  Container(
-                                    color: Colors.red,
-                                    width: 5,
+                        note.file == null
+                            ? ListTile(
+                                title: Text(
+                                  note.title,
+                                  style: TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                if (note.tags.contains('color/yellow'))
-                                  Container(
+                                ),
+                              )
+                            : Slidable(
+                                actionPane: SlidableDrawerActionPane(),
+                                actions: <Widget>[
+                                  if (note.deleted) ...[
+                                    IconSlideAction(
+                                      caption: 'Delete',
+                                      color: Colors.red,
+                                      icon: Icons.delete_forever,
+                                      onTap: () async {
+                                        if (await showDialog(
+                                                context: context,
+                                                child: AlertDialog(
+                                                  title: Text(
+                                                      'Do you really want to delete this note?'),
+                                                  content: Text(
+                                                      'This will delete it permanently.'),
+                                                  actions: <Widget>[
+                                                    FlatButton(
+                                                      child: Text('Cancel'),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop(false);
+                                                      },
+                                                    ),
+                                                    FlatButton(
+                                                      child: Text('Delete'),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop(true);
+                                                      },
+                                                    )
+                                                  ],
+                                                )) ??
+                                            false) {
+                                          store.allNotes.remove(note);
+                                          PersistentStore.deleteNote(note);
+
+                                          await _filterAndSortNotes();
+                                        }
+                                      },
+                                    ),
+                                    IconSlideAction(
+                                      caption: 'Restore',
+                                      color: Colors.redAccent,
+                                      icon: MdiIcons.deleteRestore,
+                                      onTap: () async {
+                                        note.deleted = false;
+
+                                        PersistentStore.saveNote(note);
+
+                                        await _filterAndSortNotes();
+                                      },
+                                    ),
+                                  ],
+                                  if (!note.deleted)
+                                    IconSlideAction(
+                                      caption: 'Trash',
+                                      color: Colors.red,
+                                      icon: Icons.delete,
+                                      onTap: () async {
+                                        note.deleted = true;
+
+                                        PersistentStore.saveNote(note);
+
+                                        await _filterAndSortNotes();
+                                      },
+                                    ),
+                                ],
+                                secondaryActions: <Widget>[
+                                  IconSlideAction(
+                                    caption: note.favorited ? 'Unstar' : 'Star',
                                     color: Colors.yellow,
-                                    width: 5,
+                                    icon: note.favorited
+                                        ? MdiIcons.starOff
+                                        : MdiIcons.star,
+                                    onTap: () async {
+                                      note.favorited = !note.favorited;
+
+                                      PersistentStore.saveNote(note);
+
+                                      await _filterAndSortNotes();
+                                    },
                                   ),
-                                if (note.tags.contains('color/green'))
-                                  Container(
+                                  IconSlideAction(
+                                    caption: note.pinned ? 'Unpin' : 'Pin',
                                     color: Colors.green,
-                                    width: 5,
+                                    icon: note.pinned
+                                        ? MdiIcons.pinOff
+                                        : MdiIcons.pin,
+                                    onTap: () async {
+                                      note.pinned = !note.pinned;
+
+                                      PersistentStore.saveNote(note);
+
+                                      await _filterAndSortNotes();
+                                    },
                                   ),
-                                if (note.tags.contains('color/blue'))
-                                  Container(
-                                    color: Colors.blue,
-                                    width: 5,
+                                ],
+                                child: ListTile(
+                                  selected: _selectedNotes.contains(note.title),
+                                  title: Text(note.title),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      if (note.attachments.isNotEmpty)
+                                        Icon(MdiIcons.paperclip),
+                                      if (note.favorited) Icon(MdiIcons.star),
+                                      if (note.pinned) Icon(MdiIcons.pin),
+                                      if (note.tags.contains('color/red'))
+                                        Container(
+                                          color: Colors.red,
+                                          width: 5,
+                                        ),
+                                      if (note.tags.contains('color/yellow'))
+                                        Container(
+                                          color: Colors.yellow,
+                                          width: 5,
+                                        ),
+                                      if (note.tags.contains('color/green'))
+                                        Container(
+                                          color: Colors.green,
+                                          width: 5,
+                                        ),
+                                      if (note.tags.contains('color/blue'))
+                                        Container(
+                                          color: Colors.blue,
+                                          width: 5,
+                                        ),
+                                    ],
                                   ),
-                              ],
-                            ),
-                            onTap: () async {
-                              if (_selectedNotes.isNotEmpty) {
-                                setState(() {
-                                  if (_selectedNotes.contains(note.title)) {
-                                    _selectedNotes.remove(note.title);
-                                  } else {
-                                    _selectedNotes.add(note.title);
-                                  }
-                                });
-                                return;
-                              }
-                              await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          EditPage(note, store)));
-                              _filterAndSortNotes();
-                            },
-                            onLongPress: () {
-                              setState(() {
-                                if (_selectedNotes.contains(note.title)) {
-                                  _selectedNotes.remove(note.title);
-                                } else {
-                                  _selectedNotes.add(note.title);
-                                }
-                              });
-                            },
-                          ),
-                        )
+                                  onTap: () async {
+                                    if (_selectedNotes.isNotEmpty) {
+                                      setState(() {
+                                        if (_selectedNotes
+                                            .contains(note.title)) {
+                                          _selectedNotes.remove(note.title);
+                                        } else {
+                                          _selectedNotes.add(note.title);
+                                        }
+                                      });
+                                      return;
+                                    }
+                                    await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditPage(note, store)));
+                                    _filterAndSortNotes();
+                                  },
+                                  onLongPress: () {
+                                    setState(() {
+                                      if (_selectedNotes.contains(note.title)) {
+                                        _selectedNotes.remove(note.title);
+                                      } else {
+                                        _selectedNotes.add(note.title);
+                                      }
+                                    });
+                                  },
+                                ),
+                              )
                     ],
                   ),
                 ),
@@ -505,10 +516,14 @@ class _NoteListPageState extends State<NoteListPage> {
 
             _filterAndSortNotes();
 
-            await PersistentStore.saveNote(newNote, '# ${newNote.title}');
+            await PersistentStore.saveNote(newNote, '# ${newNote.title}\n\n');
 
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => EditPage(newNote, store)));
+                builder: (context) => EditPage(
+                      newNote,
+                      store,
+                      autofocus: true,
+                    )));
           },
         ),
         bottomNavigationBar: _selectedNotes.isEmpty

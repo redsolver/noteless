@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:notable/model/note.dart';
-import 'package:notable/store/persistent.dart';
-import 'package:notable/sync/webdav.dart';
+import 'package:app/model/note.dart';
+import 'package:app/store/persistent.dart';
+import 'package:app/sync/webdav.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:preferences/preference_service.dart';
-import 'package:notable/data/samples.dart';
+import 'package:app/data/samples.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class NotesStore {
@@ -45,6 +45,7 @@ class NotesStore {
   }
 
   Directory applicationDocumentsDirectory;
+
   Future listNotes() async {
     applicationDocumentsDirectory = await getApplicationDocumentsDirectory();
     Directory directory;
@@ -65,6 +66,7 @@ class NotesStore {
       notesDir.createSync();
       await createTutorialNotes();
     }
+
     attachmentsDir = Directory('${directory.path}/attachments');
     PrefService.setString('notable_attachments_directory', attachmentsDir.path);
 
@@ -80,7 +82,11 @@ class NotesStore {
 
     allNotes = [];
 
+    DateTime start = DateTime.now();
+
     await _listNotesInFolder('');
+
+    print(DateTime.now().difference(start));
 
     // _updateTagList();
   }
@@ -88,12 +94,29 @@ class NotesStore {
   Future _listNotesInFolder(String dir, [bool isSubDirectory = false]) async {
     await for (var entity in Directory('${notesDir.path}$dir').list()) {
       if (entity is File) {
-        Note note = await PersistentStore.readNote(entity);
+        try {
+          Note note = await PersistentStore.readNote(entity);
 
-        if (note != null) {
-          if (PrefService.getBool('notes_list_virtual_tags') ?? false) {
-            if (isSubDirectory) note.tags.add('#$dir');
+          if (note != null) {
+            if (PrefService.getBool('notes_list_virtual_tags') ?? false) {
+              if (isSubDirectory) note.tags.add('#$dir');
+            }
+
+            allNotes.add(note);
           }
+        } catch (e, st) {
+          final note = Note();
+          note.title =
+              'ERROR - "$e" on parsing "${entity.path.split('/notes/').last}"';
+
+          note.created = DateTime.now();
+          note.modified = note.created;
+          note.tags = ['ERROR'];
+          note.attachments = [];
+
+          note.pinned = true;
+          note.favorited = true;
+          note.deleted = false;
 
           allNotes.add(note);
         }
