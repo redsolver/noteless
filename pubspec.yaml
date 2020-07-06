@@ -42,7 +42,7 @@ dependencies:
   flutter_slidable: ^0.5.4
   #time_machine: ^0.9.9
   directory_picker: ^1.0.0
-  file_picker: ^1.9.0
+  file_picker: ^1.12.0
   # rich_code_editor: ^1.0.0
 
 dev_dependencies:

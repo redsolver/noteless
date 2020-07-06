@@ -883,9 +883,12 @@ class _NoteListPageState extends State<NoteListPage> {
                           ),
                           IconButton(
                             icon: Icon(Icons.settings),
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => SettingsPage(store)));
+                            onPressed: () async {
+                              await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          SettingsPage(store)));
+                              setState(() {});
                             },
                           ),
                         ],

@@ -10,7 +10,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 
-    subprojects {
+/*     subprojects {
         project.configurations.all {
             resolutionStrategy.eachDependency { details ->
                 if (details.requested.group == 'androidx.lifecycle' && details.requested.name == 'lifecycle-runtime') {
@@ -21,7 +21,7 @@ buildscript {
                 }
             }
         }
-    }
+    } */
 }
 
 allprojects {
