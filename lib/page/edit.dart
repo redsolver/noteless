@@ -464,7 +464,7 @@ class _EditPageState extends State<EditPage> {
                                       keyboardType: TextInputType.multiline,
                                       maxLines: null,
                                       onChanged: (str) {
-                                        print('change!');
+                                        //print('change!');
 
                                         var diff = bsdiff(utf8.encode(str),
                                             utf8.encode(currentData));

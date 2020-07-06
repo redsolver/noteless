@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:notable/model/note.dart';
-import 'package:notable/store/notes.dart';
-import 'package:notable/store/persistent.dart';
+import 'package:app/model/note.dart';
+import 'package:app/store/notes.dart';
+import 'package:app/store/persistent.dart';
 import 'package:preferences/preferences.dart';
 import 'package:webdav/webdav.dart';
 import 'package:webdav/src/client.dart';
@@ -14,7 +14,8 @@ import 'package:intl/intl.dart';
 class WebdavSync {
   Future<String> syncFiles(NotesStore store) async {
     debugOutput = '';
-    var hostUri = Uri.parse('https://' + PrefService.getString('sync_webdav_host') ?? '');
+    var hostUri =
+        Uri.parse('https://' + PrefService.getString('sync_webdav_host') ?? '');
     var hostPath = hostUri.path;
     if (hostPath.startsWith('/')) {
       hostPath = hostPath.substring(1);

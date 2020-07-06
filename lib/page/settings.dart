@@ -26,7 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
       'sync_webdav_path': '',
       'sync_webdav_username': '',
       'sync_webdav_password': '',
-      'theme': 'dark',
+      'theme': 'light',
       'search_content': true,
       'editor_mode_switcher': true,
       'notes_list_virtual_tags': false,

@@ -4,7 +4,7 @@ import 'package:preferences/preference_service.dart';
 class ThemeNotifier with ChangeNotifier {
   ThemeNotifier() {
     _accentColor = Color(PrefService.getInt('theme_color') ?? 0xff21d885);
-    updateTheme(PrefService.getString('theme') ?? 'dark');
+    updateTheme(PrefService.getString('theme') ?? 'light');
   }
 
   ThemeType currentTheme = ThemeType.light;
