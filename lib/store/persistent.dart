@@ -59,7 +59,6 @@ class PersistentStore {
 
     if (header == null) return null;
 
-    // TODO Better Error Handling for unexpected Layout
     /* for (String line in headerString.split('\n')) {
           if (line.trim().length == 0) continue;
           print(line);
@@ -127,7 +126,6 @@ class PersistentStore {
 
     if (header == null) return null;
 
-    // TODO Better Error Handling for unexpected Layout
     /* for (String line in headerString.split('\n')) {
           if (line.trim().length == 0) continue;
           print(line);

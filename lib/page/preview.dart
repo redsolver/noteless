@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:notable/model/note.dart';
-import 'package:notable/page/edit.dart';
-import 'package:notable/page/note_list.dart';
-import 'package:notable/provider/theme.dart';
-import 'package:notable/store/notes.dart';
-import 'package:notable/store/persistent.dart';
+import 'package:app/model/note.dart';
+import 'package:app/page/edit.dart';
+import 'package:app/page/note_list.dart';
+import 'package:app/provider/theme.dart';
+import 'package:app/store/notes.dart';
+import 'package:app/store/persistent.dart';
 import 'package:preferences/preference_service.dart';
 
 import 'package:provider/provider.dart';
@@ -71,7 +71,8 @@ class PreviewPage extends StatelessWidget {
 <html>
 <head>
 ''' +
-        (Provider.of<ThemeNotifier>(context).currentTheme == ThemeType.light
+        (Provider.of<ThemeNotifier>(context, listen: false).currentTheme ==
+                ThemeType.light
             ? ''
             : '''
   <style>

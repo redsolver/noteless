@@ -26,9 +26,9 @@ class _SettingsPageState extends State<SettingsPage> {
       'sync_webdav_path': '',
       'sync_webdav_username': '',
       'sync_webdav_password': '',
-      'theme': 'light',
+      'theme': 'dark',
       'search_content': true,
-      'editor_mode_switcher': false,
+      'editor_mode_switcher': true,
       'notes_list_virtual_tags': false,
       'debug_logs_sync': false
     });
@@ -152,8 +152,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     allowFolderCreation: true,
                     context: context,
                     rootDirectory: path != null
-                        ? Directory(path)
-                        : (await getExternalStorageDirectory()));
+                            ? Directory(path)
+                            : (await getExternalStorageDirectory()));
                 print(newDirectory);
                 if (newDirectory != null) {
                   showDialog(

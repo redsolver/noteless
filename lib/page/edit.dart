@@ -4,21 +4,22 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:notable/model/note.dart';
+import 'package:app/model/note.dart';
 import 'package:markd/markdown.dart' as markd;
 import 'package:front_matter/front_matter.dart' as fm;
 import 'package:bsdiff/bsdiff.dart';
-import 'package:notable/page/note_list.dart';
-import 'package:notable/page/preview.dart';
-import 'package:notable/store/notes.dart';
-import 'package:notable/store/persistent.dart';
+import 'package:app/page/note_list.dart';
+import 'package:app/page/preview.dart';
+import 'package:app/store/notes.dart';
+import 'package:app/store/persistent.dart';
 import 'package:preferences/preference_service.dart';
 
 class EditPage extends StatefulWidget {
   final Note note;
   final NotesStore store;
+  final bool autofocus;
 
-  EditPage(this.note, this.store);
+  EditPage(this.note, this.store, {this.autofocus = false});
 
   @override
   _EditPageState createState() => _EditPageState();
@@ -53,7 +54,7 @@ class _EditPageState extends State<EditPage> {
     currentData = ctrl.text;
 
     _updateMaxLines();
-    if (PrefService.getBool('editor_mode_switcher') ?? false) {
+    if (PrefService.getBool('editor_mode_switcher') ?? true) {
       if (PrefService.getBool('editor_mode_switcher_is_preview') ?? false) {
         setState(() {
           _previewEnabled = true;
@@ -161,7 +162,7 @@ class _EditPageState extends State<EditPage> {
                     });
                   },
                 ),
-              (PrefService.getBool('editor_mode_switcher') ?? false)
+              (PrefService.getBool('editor_mode_switcher') ?? true)
                   ? Switch(
                       value: _previewEnabled,
                       activeColor: Theme.of(context).primaryIconTheme.color,
@@ -276,6 +277,7 @@ class _EditPageState extends State<EditPage> {
                                 title: Text('Add Tag'),
                                 content: TextField(
                                   controller: ctrl,
+                                  autofocus: true,
                                 ),
                                 actions: <Widget>[
                                   FlatButton(
@@ -338,7 +340,10 @@ class _EditPageState extends State<EditPage> {
                     value: 'favorite',
                     child: Row(
                       children: <Widget>[
-                        Icon(note.favorited ? MdiIcons.starOff : MdiIcons.star),
+                        Icon(
+                          note.favorited ? MdiIcons.starOff : MdiIcons.star,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         SizedBox(
                           width: 8,
                         ),
@@ -350,7 +355,10 @@ class _EditPageState extends State<EditPage> {
                     value: 'pin',
                     child: Row(
                       children: <Widget>[
-                        Icon(note.pinned ? MdiIcons.pinOff : MdiIcons.pin),
+                        Icon(
+                          note.pinned ? MdiIcons.pinOff : MdiIcons.pin,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         SizedBox(
                           width: 8,
                         ),
@@ -363,7 +371,10 @@ class _EditPageState extends State<EditPage> {
                       value: 'removeAttachment.$attachment',
                       child: Row(
                         children: <Widget>[
-                          Icon(MdiIcons.paperclip),
+                          Icon(
+                            MdiIcons.paperclip,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                           SizedBox(
                             width: 8,
                           ),
@@ -375,7 +386,10 @@ class _EditPageState extends State<EditPage> {
                     value: 'addAttachment',
                     child: Row(
                       children: <Widget>[
-                        Icon(MdiIcons.filePlus),
+                        Icon(
+                          MdiIcons.filePlus,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         SizedBox(
                           width: 8,
                         ),
@@ -388,7 +402,10 @@ class _EditPageState extends State<EditPage> {
                       value: 'removeTag.$tag',
                       child: Row(
                         children: <Widget>[
-                          Icon(MdiIcons.tag),
+                          Icon(
+                            MdiIcons.tag,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                           SizedBox(
                             width: 8,
                           ),
@@ -400,7 +417,10 @@ class _EditPageState extends State<EditPage> {
                     value: 'addTag',
                     child: Row(
                       children: <Widget>[
-                        Icon(MdiIcons.tagPlus),
+                        Icon(
+                          MdiIcons.tagPlus,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         SizedBox(
                           width: 8,
                         ),
@@ -428,6 +448,7 @@ class _EditPageState extends State<EditPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: TextField(
+                                      autofocus: widget.autofocus,
                                       scrollPhysics:
                                           NeverScrollableScrollPhysics(),
                                       controller: ctrl,
@@ -474,40 +495,6 @@ class _EditPageState extends State<EditPage> {
                                 color: Colors.transparent,
                                 child: Row(
                                   children: <Widget>[
-                                    Flexible(
-                                      fit: FlexFit.tight,
-                                      child: SizedBox(
-                                        height: double.infinity,
-                                        child: InkWell(
-                                          child: Icon(
-                                            Icons.check_box_outline_blank,
-                                          ),
-                                          onTap: () {
-                                            _scaffold.currentState
-                                                .showSnackBar(SnackBar(
-                                              content: Text('Not implemented'),
-                                            ));
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Flexible(
-                                      fit: FlexFit.tight,
-                                      child: SizedBox(
-                                        height: double.infinity,
-                                        child: InkWell(
-                                          child: Icon(
-                                            Icons.check_box_outline_blank,
-                                          ),
-                                          onTap: () {
-                                            _scaffold.currentState
-                                                .showSnackBar(SnackBar(
-                                              content: Text('Not implemented'),
-                                            ));
-                                          },
-                                        ),
-                                      ),
-                                    ),
                                     /* 
                                 if (history.isNotEmpty) */
                                     Flexible(
@@ -540,6 +527,56 @@ class _EditPageState extends State<EditPage> {
                                                       _saved = false;
                                                     });
                                                 },
+                                        ),
+                                      ),
+                                    ),
+                                    /*       Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.undo,
+                                            color: history.isEmpty
+                                                ? Colors.grey
+                                                : null,
+                                          ),
+                                          onTap: history.isEmpty
+                                              ? null
+                                              : () {
+                                                  currentData = utf8.decode(
+                                                      bspatch(
+                                                          utf8.encode(
+                                                              currentData),
+                                                          history
+                                                              .removeLast()));
+
+                                                  ctrl.text = currentData;
+                                                  if (history.isEmpty) {
+                                                    setState(() {});
+                                                  }
+                                                  if (_saved)
+                                                    setState(() {
+                                                      _saved = false;
+                                                    });
+                                                },
+                                        ),
+                                      ),
+                                    ), */
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.check_box_outline_blank,
+                                          ),
+                                          onTap: () {
+                                            _scaffold.currentState
+                                                .showSnackBar(SnackBar(
+                                              content: Text('Not implemented'),
+                                            ));
+                                          },
                                         ),
                                       ),
                                     ),
