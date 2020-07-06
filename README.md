@@ -38,6 +38,17 @@ This is because the app also has a new package name: `net.redsolver.noteless`.
 
 ## Changelog
 
+## 0.2.0
+
+- Renamed the app to "Noteless"
+- New app icon
+- Reworked tutorial notes
+- The Editor/Preview Mode Switcher is now the default option
+- New error handling: When an exception occurs while reading a note, the note is skipped and the errors are shown as "virtual notes".
+- Show loading dialog when changing external data directory
+- Fixed issue with using an external data directory on Android Q (10)
+- QOL Improvements (Autofocus, Small design improvements)
+
 ### 0.1.8
 
 - Added support for subdirectories
