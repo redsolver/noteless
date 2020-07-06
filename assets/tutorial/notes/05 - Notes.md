@@ -2,7 +2,7 @@
 tags: [Basics, Notebooks/Tutorial]
 title: 05 - Notes
 created: '2019-04-30T21:17:06.073Z'
-modified: '2019-06-06T12:20:10.973Z'
+modified: '2020-07-05T12:00:00.000Z'
 ---
 
 # 05 - Notes
@@ -17,7 +17,7 @@ Notes can have some metadata: if they are favorited or not, which tags they have
 
 ## Syntax Plugins
 
-Some syntax plugins for providing you [KaTeX](https://katex.org), [AsciiMath](http://asciimath.org) and [mermaid](https://github.com/knsv/mermaid) support are built-in, check out this note's source.
+Some syntax plugins for providing you [KaTeX](https://katex.org) and [mermaid](https://github.com/knsv/mermaid) support are built-in, check out this note's source.
 
 #### KaTeX
 
@@ -45,30 +45,19 @@ $$\ce{ SO4^2- + Ba^2+ -> BaSO4 v }$$
 
 > **Note**: If your formula contains a `$`, you will have to wrap it in either double `$$` or a code block in order to avoid clonflicts.
 
-#### AsciiMath
-
-Wrap a formula in `&&` to display it as a block:
-
-&&sum_(i=1)^n i^3=((n(n+1))/2)^2&&
-
-Wrap it in `&` to display it inline: &e = mc^2&.
-
-> **Note**: In order to minimize conflicts there mustn't be spaces at the beginning and end of a formula, and the ending `&` character musn't be followed by a digit. If you need to you can escape the `&` character with a backslash.
-
 #### mermaid
 
 ```mermaid
-graph LR
+graph TD
   Install --> Tutorial[Read the tutorial]
   Tutorial --> Star
   Tutorial --> Share
-  Tutorial -.-> mermaid[Realize how cool mermaid is]
 ```
 
 ## Attachments
 
 Notes can have attachments, because sooner or later you'll want to save a file in a note, be it a boarding pass for your next trip or something else.
 
-Attachments can be added by clicking the attachment icon in the mainbar's toolbar. Attachments are simply copied into your data directory, under the `attachments` sub-directory.
+Attachments can be added via the popup menu in the toolbar. Attachments are simply copied into your data directory, under the `attachments` sub-directory.
 
 You can open/remove them at any time.

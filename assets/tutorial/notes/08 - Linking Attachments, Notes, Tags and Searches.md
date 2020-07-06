@@ -1,16 +1,14 @@
 ---
 attachments: [icon_small.png]
 tags: [Intermediate, Notebooks/Tutorial]
-title: '10 - Linking Attachments, Notes, Tags and Searches'
+title: '08 - Linking Attachments, Notes, Tags and Searches'
 created: '2018-12-27T18:53:01.510Z'
-modified: '2019-06-06T12:20:11.040Z'
+modified: '2020-07-05T12:00:00.000Z'
 ---
 
-# 10 - Linking Attachments, Notes, Tags and Searches
+# 08 - Linking Attachments, Notes, Tags and Searches
 
-Sometimes, like when writing a tutorial for a note-taking app :wink:, you may need to link to other notes or embed a few attachments. Notable makes this easy for you.
-
-These special links can also be right-clicked so that you can perform some actions on them.
+Sometimes, like when writing a tutorial for a note-taking app :wink:, you may need to link to other notes or embed a few attachments. Noteless makes this easy for you.
 
 ## Attachments
 
@@ -21,7 +19,6 @@ Attachments can be rendered inline, linked to, and linked to via a button. The `
 ```markdown
 ![Icon](@attachment/icon_small.png)
 [Icon](@attachment/icon_small.png)
-[](@attachment/icon_small.png)
 ```
 
 ##### Result
@@ -30,8 +27,6 @@ Attachments can be rendered inline, linked to, and linked to via a button. The `
 
 [Icon](@attachment/icon_small.png)
 
-[](@attachment/icon_small.png)
-
 ## Notes
 
 Notes can be linked to, and linked to via a button. The `@note` token is used for this. Wiki-style links are supported too.
@@ -39,21 +34,12 @@ Notes can be linked to, and linked to via a button. The `@note` token is used fo
 ##### Syntax
 
 ```markdown
-[Shortcuts](@note/07 - Shortcuts.md)
-[](@note/07 - Shortcuts.md)
-[[Importing|08 - Importing.md]]
-[[08 - Importing]]
+[Tags](@note/06 - Tags.md)
 ```
 
 ##### Result
 
-[Shortcuts](@note/07 - Shortcuts.md)
-
-[](@note/07 - Shortcuts.md)
-
-[[Importing|08 - Importing.md]]
-
-[[08 - Importing]]
+[Tags](@note/06 - Tags.md)
 
 ## Tags
 
@@ -63,14 +49,11 @@ Tags can be linked to, and linked to via a button. The `@tag` token is used for 
 
 ```markdown
 [Basics](@tag/Basics)
-[](@tag/Basics)
 ```
 
 ##### Result
 
 [Basics](@tag/Basics)
-
-[](@tag/Basics)
 
 ## Searches
 
@@ -80,11 +63,8 @@ Searches can be linked to, and linked to via a button. The `@search` token is us
 
 ```markdown
 [linking](@search/linking)
-[](@search/linking)
 ```
 
 ##### Result
 
 [linking](@search/linking)
-
-[](@search/linking)
