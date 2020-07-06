@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:app/main.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -162,33 +163,34 @@ class _EditPageState extends State<EditPage> {
                     });
                   },
                 ),
-              (PrefService.getBool('editor_mode_switcher') ?? true)
-                  ? Switch(
-                      value: _previewEnabled,
-                      activeColor: Theme.of(context).primaryIconTheme.color,
-                      onChanged: (value) {
-                        PrefService.setBool(
-                            'editor_mode_switcher_is_preview', value);
-                        setState(() {
-                          _previewEnabled = value;
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.chrome_reader_mode),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => Scaffold(
-                              appBar: AppBar(
-                                title: Text('Preview'),
+              if (previewFeatureEnabled)
+                ((PrefService.getBool('editor_mode_switcher') ?? true)
+                    ? Switch(
+                        value: _previewEnabled,
+                        activeColor: Theme.of(context).primaryIconTheme.color,
+                        onChanged: (value) {
+                          PrefService.setBool(
+                              'editor_mode_switcher_is_preview', value);
+                          setState(() {
+                            _previewEnabled = value;
+                          });
+                        },
+                      )
+                    : IconButton(
+                        icon: Icon(Icons.chrome_reader_mode),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => Scaffold(
+                                appBar: AppBar(
+                                  title: Text('Preview'),
+                                ),
+                                body: PreviewPage(store, ctrl.text),
                               ),
-                              body: PreviewPage(store, ctrl.text),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      )),
               PopupMenuButton<String>(
                 onSelected: (String result) async {
                   int divIndex = result.indexOf('.');

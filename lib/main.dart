@@ -1,3 +1,4 @@
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n_delegate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,14 +19,23 @@ main() async {
   await initializeDateFormatting("en_US", null); */
   Intl.defaultLocale = 'en_US';
 
+  final deviceInfo = DeviceInfoPlugin();
+  final androidInfo = await deviceInfo.androidInfo;
+
+  // Disable note preview/render feature on Android KitKat see #32
+  if (androidInfo.version.sdkInt < 20) {
+    previewFeatureEnabled = false;
+  }
+
   runApp(
     ChangeNotifierProvider<ThemeNotifier>(
       create: (_) => ThemeNotifier(),
-
       child: App(),
     ),
   );
 }
+
+bool previewFeatureEnabled = true;
 
 class App extends StatelessWidget {
   @override

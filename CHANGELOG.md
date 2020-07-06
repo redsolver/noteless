@@ -8,6 +8,10 @@ If you used an earlier Alpha Version, you need to uninstall the old one and inst
 
 This is because the app also has a new package name: `net.redsolver.noteless`.
 
+## master
+
+- Disabled the preview feature on Android 4.4 KitKat devices.
+
 ## 0.2.0
 
 - Renamed the app to "Noteless"
