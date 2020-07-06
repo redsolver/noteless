@@ -38,7 +38,7 @@ This is because the app also has a new package name: `net.redsolver.noteless`.
 
 ## Changelog
 
-## 0.2.0
+### 0.2.0
 
 - Renamed the app to "Noteless"
 - New app icon
