@@ -42,6 +42,11 @@ I recommend using an external data directory and a third-party sync app for Andr
 
 ## Changelog
 
+### 0.2.1
+
+- Disabled the preview feature on Android 4.4 KitKat devices.
+- Removed WebDav sync
+
 ### 0.2.0
 
 - Renamed the app to "Noteless"
