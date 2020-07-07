@@ -152,8 +152,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     allowFolderCreation: true,
                     context: context,
                     rootDirectory: path != null
-                            ? Directory(path)
-                            : (await getExternalStorageDirectory()));
+                        ? Directory(path)
+                        : (await getExternalStorageDirectory()));
                 print(newDirectory);
                 if (newDirectory != null) {
                   showDialog(
@@ -189,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
           'Search content of notes',
           'search_content',
         ),
-        PreferenceTitle('Sync'),
+        /*        PreferenceTitle('Sync'),
         RadioPreference(
           'No Sync',
           '',
@@ -239,6 +239,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
+        */
         PreferenceTitle('More'),
         ListTile(
           title: Text('Recreate tutorial notes'),

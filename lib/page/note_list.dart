@@ -7,6 +7,7 @@ import 'package:app/page/edit.dart';
 import 'package:app/page/settings.dart';
 import 'package:app/store/notes.dart';
 import 'package:app/store/persistent.dart';
+import 'package:package_info/package_info.dart';
 import 'package:preferences/preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -870,7 +871,14 @@ class _NoteListPageState extends State<NoteListPage> {
                 child: ListView(
                 children: <Widget>[
                   ListTile(
-                      title: Text(store.syncMethodName + ' Sync'),
+                      title: FutureBuilder(
+                        future: PackageInfo.fromPlatform(),
+                        builder: (context, snap) {
+                          if (!snap.hasData) return SizedBox();
+                          PackageInfo info = snap.data;
+                          return Text('${info.appName} ${info.version}');
+                        },
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[

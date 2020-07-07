@@ -1,4 +1,4 @@
-import 'dart:core' hide writeDebugLine;
+/* import 'dart:core' hide writeDebugLine;
 import 'dart:convert';
 import 'dart:io';
 
@@ -184,3 +184,4 @@ class WebdavSync {
     timestampFile.writeAsStringSync(json.encode(localSyncTimestamps));
   }
 }
+ */

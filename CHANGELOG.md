@@ -8,9 +8,14 @@ If you used an earlier Alpha Version, you need to uninstall the old one and inst
 
 This is because the app also has a new package name: `net.redsolver.noteless`.
 
+Also I decided to drop support for syncing notes directly via the app because there are alternative options which work a lot better.
+
+I recommend using an external data directory and a third-party sync app for Android like [Syncthing](https://syncthing.net/), Nextcloud Sync or FolderSync for other cloud services.
+
 ## master
 
 - Disabled the preview feature on Android 4.4 KitKat devices.
+- Removed WebDav sync
 
 ## 0.2.0
 

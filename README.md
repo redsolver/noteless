@@ -18,7 +18,7 @@ This is because the app also has a new package name: `net.redsolver.noteless`.
 
 Also I decided to drop support for syncing notes directly via the app because there are alternative options which work a lot better.
 
-I recommend using an external data directory and using a third-party sync app for Android like [Syncthing](https://syncthing.net/) or FolderSync for other cloud services.
+I recommend using an external data directory and a third-party sync app for Android like [Syncthing](https://syncthing.net/), Nextcloud Sync or FolderSync for other cloud services.
 
 ## Screenshots
 

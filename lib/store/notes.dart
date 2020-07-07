@@ -241,10 +241,10 @@ class NotesStore {
   Set<String> rootTags = {};
 
   Future<String> syncNow() async {
-    switch (syncMethod) {
+/*     switch (syncMethod) {
       case 'webdav':
         return await WebdavSync().syncFiles(this);
-    }
+    } */
     return null;
   }
 
