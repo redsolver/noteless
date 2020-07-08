@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:app/editor/syntax_highlighter.dart';
 import 'package:app/main.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +11,11 @@ import 'package:app/model/note.dart';
 import 'package:markd/markdown.dart' as markd;
 import 'package:front_matter/front_matter.dart' as fm;
 import 'package:bsdiff/bsdiff.dart';
-import 'package:app/page/note_list.dart';
 import 'package:app/page/preview.dart';
 import 'package:app/store/notes.dart';
 import 'package:app/store/persistent.dart';
 import 'package:preferences/preference_service.dart';
+import 'package:rich_code_editor/exports.dart';
 
 class EditPage extends StatefulWidget {
   final Note note;
@@ -28,7 +30,16 @@ class EditPage extends StatefulWidget {
 
 class _EditPageState extends State<EditPage> {
   NotesStore get store => widget.store;
-  TextEditingController ctrl;
+  RichCodeEditingController _rec;
+  NotelessSyntaxHighlighter _syntaxHighlighterBase;
+
+  GlobalKey _richTextFieldState = GlobalKey();
+
+  @override
+  void dispose() {
+    _richTextFieldState.currentState?.dispose();
+    super.dispose();
+  }
 
   Note note;
 
@@ -50,11 +61,44 @@ class _EditPageState extends State<EditPage> {
 
     var doc = fm.parse(content);
 
-    ctrl = TextEditingController(text: doc.content.trimLeft());
+    _syntaxHighlighterBase = NotelessSyntaxHighlighter(
+/*       accentColor: Theme.of(context).accentColor, */
+        );
+    _rec = RichCodeEditingController(_syntaxHighlighterBase,
+        text: doc.content.trimLeft());
 
-    currentData = ctrl.text;
+    _rec.addListener(() {
+      if (_rec.text == currentData) return;
 
-    _updateMaxLines();
+      var diff = bsdiff(utf8.encode(_rec.text), utf8.encode(currentData));
+
+      history.add(diff);
+      cursorHistory.add(_rec.selection.start);
+
+      if (history.length == 1) {
+        // First entry
+        setState(() {});
+      } else if (history.length > 1000) {
+        // First entry
+        history.removeAt(0);
+        cursorHistory.removeAt(0);
+      }
+
+      currentData = _rec.text;
+      if (_saved)
+        setState(() {
+          _saved = false;
+        });
+    });
+
+    if (widget.autofocus) {
+      _rec.selection =
+          TextSelection(baseOffset: 2, extentOffset: _rec.text.trim().length);
+    }
+
+    currentData = _rec.text;
+
+    //_updateMaxLines();
     if (PrefService.getBool('editor_mode_switcher') ?? true) {
       if (PrefService.getBool('editor_mode_switcher_is_preview') ?? false) {
         setState(() {
@@ -94,6 +138,9 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_syntaxHighlighterBase.accentColor == null)
+      _syntaxHighlighterBase.init(Theme.of(context).accentColor);
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -185,7 +232,7 @@ class _EditPageState extends State<EditPage> {
                                 appBar: AppBar(
                                   title: Text('Preview'),
                                 ),
-                                body: PreviewPage(store, ctrl.text),
+                                body: PreviewPage(store, _rec.text),
                               ),
                             ),
                           );
@@ -436,10 +483,10 @@ class _EditPageState extends State<EditPage> {
           ),
           body: /* GestureDetector(
           child: */
-              ctrl == null
+              _rec == null
                   ? LinearProgressIndicator()
                   : _previewEnabled
-                      ? PreviewPage(store, ctrl.text)
+                      ? PreviewPage(store, _rec.text)
                       : Column(
                           children: <Widget>[
                             Expanded(
@@ -449,42 +496,37 @@ class _EditPageState extends State<EditPage> {
                                 child: SingleChildScrollView(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: TextField(
-                                      autofocus: widget.autofocus,
+                                    child: RichCodeField(
+                                      key: _richTextFieldState,
                                       scrollPhysics:
                                           NeverScrollableScrollPhysics(),
-                                      controller: ctrl,
+                                      autofocus: widget.autofocus,
+                                      controller: _rec,
                                       style: TextStyle(
                                           fontFamily: 'FiraMono',
-                                          fontFamilyFallback: ['monospace']),
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          contentPadding:
-                                              const EdgeInsets.all(0.0)),
-                                      scrollPadding: const EdgeInsets.all(0.0),
-                                      /*  autofocus: true, */
-                                      keyboardType: TextInputType.multiline,
+                                          fontFamilyFallback: ['monospace'],
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
+                                      textCapitalization:
+                                          TextCapitalization.sentences,
+                                      decoration: null,
+                                      syntaxHighlighter: _syntaxHighlighterBase,
                                       maxLines: null,
-                                      onChanged: (str) {
-                                        //print('change!');
-
-                                        var diff = bsdiff(utf8.encode(str),
-                                            utf8.encode(currentData));
-                                        history.add(diff);
-                                        if (history.length == 1) {
-                                          // First entry
-                                          setState(() {});
-                                        } else if (history.length > 1000) {
-                                          // First entry
-                                          history.removeAt(0);
+                                      cursorColor:
+                                          Theme.of(context).accentColor,
+                                      /* onChanged: (str) {
+                                      }, */
+                                      /* onBackSpacePress:
+                                          (TextEditingValue oldValue) {}, */
+                                      /*     onEnterPress:
+                                          (TextEditingValue oldValue) {
+                                        var result = _syntaxHighlighterBase
+                                            .onEnterPress(oldValue);
+                                        if (result != null) {
+                                          _rec.value = result;
                                         }
-
-                                        currentData = str;
-                                        if (_saved)
-                                          setState(() {
-                                            _saved = false;
-                                          });
-                                      },
+                                      }, */
                                     ),
                                   ),
                                 ),
@@ -520,7 +562,17 @@ class _EditPageState extends State<EditPage> {
                                                           history
                                                               .removeLast()));
 
-                                                  ctrl.text = currentData;
+                                                  _rec.text = currentData;
+
+                                                  int pos = cursorHistory
+                                                      .removeLast();
+                                                  if (pos > 0) pos--;
+
+                                                  _rec.selection =
+                                                      TextSelection(
+                                                          baseOffset: pos,
+                                                          extentOffset: pos);
+
                                                   if (history.isEmpty) {
                                                     setState(() {});
                                                   }
@@ -532,52 +584,224 @@ class _EditPageState extends State<EditPage> {
                                         ),
                                       ),
                                     ),
-                                    /*       Flexible(
-                                      fit: FlexFit.tight,
-                                      child: SizedBox(
-                                        height: double.infinity,
-                                        child: InkWell(
-                                          child: Icon(
-                                            Icons.undo,
-                                            color: history.isEmpty
-                                                ? Colors.grey
-                                                : null,
-                                          ),
-                                          onTap: history.isEmpty
-                                              ? null
-                                              : () {
-                                                  currentData = utf8.decode(
-                                                      bspatch(
-                                                          utf8.encode(
-                                                              currentData),
-                                                          history
-                                                              .removeLast()));
 
-                                                  ctrl.text = currentData;
-                                                  if (history.isEmpty) {
-                                                    setState(() {});
-                                                  }
-                                                  if (_saved)
-                                                    setState(() {
-                                                      _saved = false;
-                                                    });
-                                                },
-                                        ),
-                                      ),
-                                    ), */
+                                    // TODO Link and Image Helper
+                                    Container(
+                                      width: 1,
+                                      color: Colors.grey,
+                                    ),
                                     Flexible(
                                       fit: FlexFit.tight,
                                       child: SizedBox(
                                         height: double.infinity,
                                         child: InkWell(
                                           child: Icon(
-                                            Icons.check_box_outline_blank,
+                                            MdiIcons.pound,
+                                            size: 22,
                                           ),
                                           onTap: () {
-                                            _scaffold.currentState
-                                                .showSnackBar(SnackBar(
-                                              content: Text('Not implemented'),
-                                            ));
+                                            int oldStart = _rec.selection.start;
+
+                                            int start = oldStart;
+
+                                            while (start > 0) {
+                                              start--;
+                                              if (_rec.text[start] == '\n')
+                                                break;
+                                            }
+                                            if (start != 0) start++;
+
+                                            String startOfLine =
+                                                _rec.text.substring(
+                                              start,
+                                            );
+                                            String part = '';
+
+                                            for (var s
+                                                in startOfLine.split('')) {
+                                              if (s != '#') break;
+                                              part += s;
+                                            }
+
+                                            final before =
+                                                _rec.text.substring(0, start);
+
+                                            if (part == '######') {
+                                              _rec.text = before +
+                                                  startOfLine
+                                                      .substring(6)
+                                                      .trimLeft();
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: oldStart - 7,
+                                                  extentOffset: oldStart - 7);
+                                            } else {
+                                              String change = '';
+                                              if (part == '') {
+                                                change = '# ';
+                                              } else {
+                                                change = '#';
+                                              }
+                                              _rec.text =
+                                                  before + change + startOfLine;
+                                              _rec.selection = TextSelection(
+                                                  baseOffset:
+                                                      oldStart + change.length,
+                                                  extentOffset:
+                                                      oldStart + change.length);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            MdiIcons.formatListBulleted,
+                                          ),
+                                          onTap: () {
+                                            // TODO Support * and >
+                                            int oldStart = _rec.selection.start;
+
+                                            int start = oldStart;
+
+                                            while (start > 0) {
+                                              start--;
+                                              if (_rec.text[start] == '\n')
+                                                break;
+                                            }
+                                            if (start != 0) start++;
+
+                                            String startOfLine =
+                                                _rec.text.substring(
+                                              start,
+                                            );
+                                            final before =
+                                                _rec.text.substring(0, start);
+
+                                            if (startOfLine.startsWith('-')) {
+                                              int length = 1;
+
+                                              if (startOfLine.startsWith('- '))
+                                                length++;
+                                              _rec.text = before +
+                                                  startOfLine
+                                                      .substring(1)
+                                                      .trimLeft();
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: oldStart - length,
+                                                  extentOffset:
+                                                      oldStart - length);
+                                            } else {
+                                              _rec.text =
+                                                  before + '- ' + startOfLine;
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: oldStart + 2,
+                                                  extentOffset: oldStart + 2);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 1,
+                                      color: Colors.grey,
+                                    ),
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.format_bold,
+                                          ),
+                                          onTap: () {
+                                            int start = _rec.selection.start;
+                                            int end = _rec.selection.end;
+
+                                            final before = _rec.text.substring(
+                                                0, _rec.selection.start);
+                                            final content = _rec.text.substring(
+                                                _rec.selection.start,
+                                                _rec.selection.end);
+                                            final after = _rec.text
+                                                .substring(_rec.selection.end);
+
+                                            if (before.endsWith('**') &&
+                                                after.startsWith('**')) {
+                                              _rec.text = before.substring(
+                                                      0, before.length - 2) +
+                                                  content +
+                                                  after.substring(2);
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: start - 2,
+                                                  extentOffset: end - 2);
+                                            } else {
+                                              _rec.text = before +
+                                                  '**' +
+                                                  content +
+                                                  '**' +
+                                                  after;
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: start + 2,
+                                                  extentOffset: end + 2);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            Icons.format_italic,
+                                          ),
+                                          onTap: () {
+                                            int start = _rec.selection.start;
+                                            int end = _rec.selection.end;
+
+                                            if (_rec.text[start] == '_' &&
+                                                _rec.text[end - 1] == '_' &&
+                                                start != end) {
+                                              start += 1;
+                                              end -= 1;
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: start,
+                                                  extentOffset: end);
+                                            }
+
+                                            final before = _rec.text.substring(
+                                                0, _rec.selection.start);
+                                            final content = _rec.text.substring(
+                                                _rec.selection.start,
+                                                _rec.selection.end);
+                                            final after = _rec.text
+                                                .substring(_rec.selection.end);
+
+                                            if (before.endsWith('_') &&
+                                                after.startsWith('_')) {
+                                              _rec.text = before.substring(
+                                                      0, before.length - 1) +
+                                                  content +
+                                                  after.substring(1);
+
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: start - 1,
+                                                  extentOffset: end - 1);
+                                            } else {
+                                              _rec.text = before +
+                                                  '_' +
+                                                  content +
+                                                  '_' +
+                                                  after;
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: start + 1,
+                                                  extentOffset: end + 1);
+                                            }
                                           },
                                         ),
                                       ),
@@ -593,16 +817,17 @@ class _EditPageState extends State<EditPage> {
 
   String currentData = '';
 
-  List history = [];
+  List<Uint8List> history = [];
+  List<int> cursorHistory = [];
 
-  int maxLines = 0;
+/*   int maxLines = 0;
   _updateMaxLines() {
-    int newMaxLines = ctrl.text.split('\n').length + 3;
+    int newMaxLines = _rec.text.split('\n').length + 3;
     if (newMaxLines < 10) newMaxLines = 10;
     if (newMaxLines != maxLines) {
       setState(() {
         maxLines = newMaxLines;
       });
     }
-  }
+  } */
 }
