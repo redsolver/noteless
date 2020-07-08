@@ -51,13 +51,17 @@ class PersistentStore {
 
     String fileContent = file.readAsStringSync();
 
-    var doc = fm.parse(fileContent);
+    Map header;
+
+    if (fileContent.trimLeft().startsWith('---')) {
+      var doc = fm.parse(fileContent);
 /* 
         String headerString = fileContent.split('---')[1]; */
 
-    var header = doc.data /* loadYaml(headerString) */;
-
-    if (header == null) return null;
+      header = doc.data ?? {};
+    } else {
+      header = {};
+    }
 
     /* for (String line in headerString.split('\n')) {
           if (line.trim().length == 0) continue;
@@ -71,8 +75,27 @@ class PersistentStore {
     note.file = file;
 
     note.title = header['title'];
-    note.created = DateTime.parse(header['created']);
-    note.modified = DateTime.parse(header['modified']);
+
+    if (note.title == null) {
+      var title = file.path.split('/').last;
+      if (title.endsWith('.md')) {
+        title = title.substring(0, title.length - 3);
+      }
+      note.title = title;
+    }
+
+    if (header['modified'] != null) {
+      note.modified = DateTime.parse(header['modified']);
+    } else {
+      note.modified = file.lastModifiedSync();
+    }
+
+    if (header['created'] != null) {
+      note.created = DateTime.parse(header['created']);
+    } else {
+      note.created = note.modified;
+    }
+
     /* 
         note.tags =
             (header['tags'] as YamlList).map((s) => s.toString()).toList(); */
