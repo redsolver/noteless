@@ -48,6 +48,11 @@ I recommend using an external data directory and a third-party sync app for Andr
 
 ## Changelog
 
+### 0.3.0
+
+- Fully reworked editor with syntax highlighting and a new keyboard toolbar to help with common Markdown operations
+- Added fallback to file metadata if front matter data is missing
+
 ### 0.2.1
 
 - Disabled the preview feature on Android 4.4 KitKat devices.
