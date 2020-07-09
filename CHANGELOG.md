@@ -12,6 +12,10 @@ Also I decided to drop support for syncing notes directly via the app because th
 
 I recommend using an external data directory and a third-party sync app for Android like [Syncthing](https://syncthing.net/), Nextcloud Sync or FolderSync for other cloud services.
 
+## 0.3.1
+
+- Fixed editor content not loading without front matter data
+
 ## 0.3.0
 
 - Fully reworked editor with syntax highlighting and a new keyboard toolbar to help with common Markdown operations

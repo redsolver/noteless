@@ -8,11 +8,24 @@ import 'package:front_matter/front_matter.dart' as fm;
 import 'package:app/model/note.dart';
 
 class PersistentStore {
+  static Future<String> readContent(File file) async {
+    if (!file.existsSync()) return null;
+
+    String fileContent = await file.readAsString();
+
+    if (fileContent.trimLeft().startsWith('---')) {
+      var doc = fm.parse(fileContent);
+      if (doc.content != null) return doc.content.trimLeft();
+    }
+
+    return fileContent.trimLeft();
+  }
+
   static Future saveNote(Note note, [String content]) async {
     // print('PersistentStore.saveNote');
 
     if (content == null) {
-      content = fm.parse(note.file.readAsStringSync()).content;
+      content = await readContent(note.file);
     }
 
     String header = '---\n';
@@ -36,7 +49,9 @@ class PersistentStore {
 
     header += toYamlString(data);
 
-    header += '\n---\n\n';
+    if (!header.endsWith('\n')) header += '\n';
+
+    header += '---\n\n';
 
     // print(header);
 

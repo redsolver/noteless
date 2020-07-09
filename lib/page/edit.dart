@@ -31,7 +31,8 @@ class EditPage extends StatefulWidget {
 class _EditPageState extends State<EditPage> {
   NotesStore get store => widget.store;
   RichCodeEditingController _rec;
-  NotelessSyntaxHighlighter _syntaxHighlighterBase;
+  NotelessSyntaxHighlighter _syntaxHighlighterBase =
+      NotelessSyntaxHighlighter();
 
   GlobalKey _richTextFieldState = GlobalKey();
 
@@ -57,15 +58,13 @@ class _EditPageState extends State<EditPage> {
   }
 
   _loadContent() async {
-    String content = note.file.readAsStringSync();
+    /*  String content = note.file.readAsStringSync();
 
-    var doc = fm.parse(content);
+    var doc = fm.parse(content); */
+    final content = await PersistentStore.readContent(note.file);
 
-    _syntaxHighlighterBase = NotelessSyntaxHighlighter(
-/*       accentColor: Theme.of(context).accentColor, */
-        );
     _rec = RichCodeEditingController(_syntaxHighlighterBase,
-        text: doc.content.trimLeft());
+        text: content.trimLeft());
 
     _rec.addListener(() {
       if (_rec.text == currentData) return;
@@ -106,6 +105,7 @@ class _EditPageState extends State<EditPage> {
         });
       }
     }
+    if (mounted) setState(() {});
   }
 
   GlobalKey<ScaffoldState> _scaffold = GlobalKey();

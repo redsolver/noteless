@@ -48,6 +48,10 @@ I recommend using an external data directory and a third-party sync app for Andr
 
 ## Changelog
 
+### 0.3.1
+
+- Fixed editor content not loading without front matter data
+
 ### 0.3.0
 
 - Fully reworked editor with syntax highlighting and a new keyboard toolbar to help with common Markdown operations
