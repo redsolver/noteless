@@ -48,6 +48,10 @@ I recommend using an external data directory and a third-party sync app for Andr
 
 ## Changelog
 
+### 0.3.2
+
+- Added F-Droid metadata
+
 ### 0.3.1
 
 - Fixed editor content not loading without front matter data
