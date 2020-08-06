@@ -1,6 +1,6 @@
 # Noteless
 
-A markdown note-taking app for mobile devices (Android only at the moment, iOS is planned).
+A markdown-based note-taking app for mobile devices (Android only at the moment, iOS is planned).
 
 Compatible with notes saved in [Notable](https://notable.app/)
 
