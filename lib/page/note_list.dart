@@ -184,7 +184,7 @@ class _NoteListPageState extends State<NoteListPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('Noteless Alpha'),
+                      Text('Noteless'),
                       if (store.currentTag.length > 0)
                         Text(
                           store.currentTag,

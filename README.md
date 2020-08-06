@@ -48,6 +48,12 @@ I recommend using an external data directory and a third-party sync app for Andr
 
 ## Changelog
 
+### 1.0.0
+
+- First stable release
+- Submitted the app to Google Play Store and F-Droid
+- Updated to Flutter 1.20 (Better Performance and some bug fixes in the editor)
+
 ### 0.3.2
 
 - Added F-Droid metadata

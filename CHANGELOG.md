@@ -12,6 +12,12 @@ Also I decided to drop support for syncing notes directly via the app because th
 
 I recommend using an external data directory and a third-party sync app for Android like [Syncthing](https://syncthing.net/), Nextcloud Sync or FolderSync for other cloud services.
 
+## 1.0.0
+
+- First stable release
+- Submitted the app to Google Play Store and F-Droid
+- Updated to Flutter 1.20 (Better Performance and some bug fixes in the editor)
+
 ## 0.3.2
 
 - Added F-Droid metadata
