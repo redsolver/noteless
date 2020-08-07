@@ -2,10 +2,10 @@
 
 # Noteless
 
+A markdown-based note-taking app for Android.
+
 [![Google Play](https://img.shields.io/endpoint?style=for-the-badge&color=orange&logo=google-play&logoColor=orange&url=https%3A%2F%2Fplayshields.herokuapp.com%2Fplay%3Fi%3Dnet.redsolver.noteless%26l%3DGoogle%2520Play%26m%3D%24version)](https://play.google.com/store/apps/details?id=net.redsolver.noteless)
 [![GitHub All Releases](https://img.shields.io/github/downloads/redsolver/noteless/total?style=for-the-badge)](https://github.com/redsolver/noteless/releases)
-
-A markdown-based note-taking app for Android.
 
 Compatible with notes saved in [Notable](https://notable.app/)
 
