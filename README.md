@@ -56,6 +56,10 @@ Compatible with notes saved in [Notable](https://notable.app/)
 
 ## Changelog
 
+### 1.1.1
+
+- Added support for spaces in links (#36)
+
 ### 1.1.0
 
 - Made checkboxes in preview mode toggleable (#37)
