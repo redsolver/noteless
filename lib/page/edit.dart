@@ -232,7 +232,8 @@ class _EditPageState extends State<EditPage> {
                                 appBar: AppBar(
                                   title: Text('Preview'),
                                 ),
-                                body: PreviewPage(store, _rec.text),
+                                body: PreviewPage(
+                                    store, _rec.text, _rec, Theme.of(context)),
                               ),
                             ),
                           );
@@ -486,7 +487,7 @@ class _EditPageState extends State<EditPage> {
               _rec == null
                   ? LinearProgressIndicator()
                   : _previewEnabled
-                      ? PreviewPage(store, _rec.text)
+                      ? PreviewPage(store, _rec.text, _rec, Theme.of(context))
                       : Column(
                           children: <Widget>[
                             Expanded(

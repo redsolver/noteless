@@ -250,6 +250,16 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
               match.input.substring(match.start, match.end) +
               '<nless-format-tmp>0');
 
+      // Wiki-Style note links like [[Note]]
+
+      s = s.replaceAllMapped(RegExp(r'\[\[[^\]]+\]\]'), (match) {
+        var str = match.input.substring(match.start, match.end);
+
+        String title = str.substring(2).split(']').first;
+
+        return '<nless-format-tmp>7[[<nless-format-tmp>0$title<nless-format-tmp>7]]<nless-format-tmp>0';
+      });
+
       // Emojis
 
       s = s.replaceAllMapped(

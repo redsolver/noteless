@@ -35,11 +35,14 @@ Notes can be linked to, and linked to via a button. The `@note` token is used fo
 
 ```markdown
 [Tags](@note/06 - Tags.md)
+[[06 - Tags]]
 ```
 
 ##### Result
 
 [Tags](@note/06 - Tags.md)
+
+[[06 - Tags]]
 
 ## Tags
 

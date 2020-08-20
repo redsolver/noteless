@@ -10,24 +10,45 @@ import 'package:app/store/persistent.dart';
 import 'package:preferences/preference_service.dart';
 
 import 'package:provider/provider.dart';
+import 'package:rich_code_editor/rich_code_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:markd/markdown.dart' as markd;
 
-class PreviewPage extends StatelessWidget {
+
+class PreviewPage extends StatefulWidget {
   final NotesStore store;
   final String textContent;
+  final RichCodeEditingController richCtrl;
 
-  PreviewPage(this.store, this.textContent);
+  final ThemeData theme;
 
-  BuildContext context;
+  PreviewPage(this.store, this.textContent, this.richCtrl, this.theme);
 
   @override
-  Widget build(BuildContext context) {
-    this.context = context;
+  _PreviewPageState createState() => _PreviewPageState();
+}
 
-    final directory = store.applicationDocumentsDirectory;
+class _PreviewPageState extends State<PreviewPage> {
+  // BuildContext context;
+
+  String currentTextContent;
+
+  @override
+  void initState() {
+    _processContent();
+    super.initState();
+  }
+
+  List<int> checkboxPositions = [];
+
+  File previewFile;
+
+  _processContent() async {
+    //this.context = context;
+
+    final directory = widget.store.applicationDocumentsDirectory;
 
     final previewDir = Directory('${directory.path}/preview');
 
@@ -37,12 +58,31 @@ class PreviewPage extends StatelessWidget {
     /*  final previewAssetsDir =
                       Directory('${directory.path}/preview/assets'); */
 
-    final File previewFile = File('${previewDir.path}/index.html');
+    previewFile = File('${previewDir.path}/index.html');
     previewFile.createSync(recursive: true);
 
     // TODO iOS Preview
 
-    String content = textContent;
+    currentTextContent = widget.textContent;
+
+    for (final match in RegExp(r'\[(x| )\]').allMatches(currentTextContent)) {
+      // print(match);
+      checkboxPositions.add(match.start + 1);
+    }
+
+    String content = widget.textContent;
+
+    // Wiki-Style note links like [[Note]]
+
+    content = content.replaceAllMapped(RegExp(r'\[\[[^\]]+\]\]'), (match) {
+      var str = match.input.substring(match.start, match.end);
+
+      String title = str.substring(2).split(']').first;
+
+      return '[$title](@note/$title' +
+          (title.endsWith('.md') ? '' : '.md') +
+          ')';
+    });
 
     content =
         content.replaceAllMapped(RegExp(r'(?<=\]\(@note\/).*(?=\))'), (match) {
@@ -51,7 +91,7 @@ class PreviewPage extends StatelessWidget {
 
     content = content.replaceAll(RegExp(r'\\\\'), '\\\\\\\\');
 
-    ThemeData theme = Theme.of(context);
+    ThemeData theme = widget.theme;
 
     String backgroundColor = theme.scaffoldBackgroundColor.value
         .toRadixString(16)
@@ -142,6 +182,8 @@ class PreviewPage extends StatelessWidget {
 
   </body>
   </html>''';
+
+/*     generatedPreview = generatedPreview.replaceAll('\\ ', ' '); */
     generatedPreview = generatedPreview.replaceAll(
         'src="@attachment/',
         'src="' +
@@ -149,71 +191,117 @@ class PreviewPage extends StatelessWidget {
             PrefService.getString('notable_attachments_directory') +
             '/');
 
-    previewFile.writeAsStringSync(generatedPreview);
+    int checkboxIndex = -1;
 
-    bool _pageLoaded = false;
+    generatedPreview = generatedPreview.replaceAllMapped(
+        'disabled="disabled" class="todo" type="checkbox"', (match) {
+      checkboxIndex++;
+
+      return 'class="todo" type="checkbox" onclick="notelesscheckbox.postMessage( this.checked + \'-$checkboxIndex\');"';
+    }
+        );
+
+    await previewFile.writeAsString(generatedPreview);
+
+    setState(() {
+      _processingDone = true;
+    });
+  }
+
+  bool _processingDone = false;
+
+  bool _pageLoaded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // print('BUILD');
 
     return StatefulBuilder(
       builder: (context, setState) {
-        return Stack(
-          children: <Widget>[
-            WebView(
-              initialUrl: 'file://' + previewFile.path,
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (ctrl) {},
-              javascriptChannels: {
-                JavascriptChannel(
-                    name: 'flutternotable',
-                    onMessageReceived: (_) async {
-                      setState(() {
-                        _pageLoaded = true;
-                      });
-                    })
-              },
-              navigationDelegate: (request) {
-                print(request.url);
-
-                if (request.url.startsWith('file://')) {
-                  String link =
-                      Uri.decodeFull(RegExp(r'@.*').stringMatch(request.url));
-                  print(link);
-
-                  String type = RegExp(r'(?<=@).*(?=/)').stringMatch(link);
-
-                  String data = RegExp(r'(?<=/).*').stringMatch(link);
-                  print(type);
-                  print(data);
-                  print(Theme.of(context).brightness);
-                  switch (type) {
-                    case 'note':
-                      _navigateToNote(data);
-
-                      break;
-                    case 'tag':
-                      _navigateToTag(data);
-                      break;
-                    case 'search':
-                      _navigateToSearch(data);
-                      break;
-                    case 'attachment':
-                      break;
-                  }
-                } else {
-                  launch(
-                    request.url,
-                  );
-                }
-                return NavigationDecision.prevent;
-              },
-            ),
-            if (!_pageLoaded)
-              Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                alignment: Alignment.center,
+        return !_processingDone
+            ? Center(
                 child: CircularProgressIndicator(),
-              ),
-          ],
-        );
+              )
+            : Stack(
+                children: <Widget>[
+                  WebView(
+                    initialUrl: 'file://' + previewFile.path,
+                    javascriptMode: JavascriptMode.unrestricted,
+                    onWebViewCreated: (ctrl) {},
+                    javascriptChannels: {
+                      JavascriptChannel(
+                          name: 'flutternotable',
+                          onMessageReceived: (_) async {
+                            setState(() {
+                              _pageLoaded = true;
+                            });
+                          }),
+                      JavascriptChannel(
+                          name: 'notelesscheckbox',
+                          onMessageReceived: (msg) async {
+                            final parts = msg.message.split('-');
+
+                            final bool checked = parts[0] == 'true';
+
+                            final int id = int.parse(parts[1]);
+
+                            final index = checkboxPositions[id];
+
+                            currentTextContent =
+                                currentTextContent.substring(0, index) +
+                                    (checked ? 'x' : ' ') +
+                                    currentTextContent.substring(index + 1);
+
+                            widget.richCtrl.text = currentTextContent;
+
+                            // textContent
+                          }),
+                    },
+                    navigationDelegate: (request) {
+                      print(request.url);
+
+                      if (request.url.startsWith('file://')) {
+                        String link = Uri.decodeFull(
+                            RegExp(r'@.*').stringMatch(request.url));
+                        print(link);
+
+                        String type =
+                            RegExp(r'(?<=@).*(?=/)').stringMatch(link);
+
+                        String data = RegExp(r'(?<=/).*').stringMatch(link);
+                        print(type);
+                        print(data);
+                        print(Theme.of(context).brightness);
+                        switch (type) {
+                          case 'note':
+                            _navigateToNote(data);
+
+                            break;
+                          case 'tag':
+                            _navigateToTag(data);
+                            break;
+                          case 'search':
+                            _navigateToSearch(data);
+                            break;
+                          case 'attachment':
+                            break;
+                        }
+                      } else {
+                        launch(
+                          request.url,
+                        );
+                      }
+                      return NavigationDecision.prevent;
+                    },
+                  ),
+                  if (!_pageLoaded)
+                    Container(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
+              );
       },
     );
   }
@@ -225,8 +313,8 @@ class PreviewPage extends StatelessWidget {
     if (newNote == null) {
       // TODO Show Error
     } else {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => EditPage(newNote, store)));
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => EditPage(newNote, widget.store)));
     }
   }
 

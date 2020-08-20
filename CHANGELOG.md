@@ -1,16 +1,9 @@
 # Changelog
 
-## Important Changes in Version 0.2.0 
+## 1.1.0
 
-The app has been renamed from `Notable Mobile` to `Noteless` on 02.07.2020.
-
-If you used an earlier Alpha Version, you need to uninstall the old one and install one of the new APKs (Don't forget to backup your notes!)
-
-This is because the app also has a new package name: `net.redsolver.noteless`.
-
-Also I decided to drop support for syncing notes directly via the app because there are alternative options which work a lot better.
-
-I recommend using an external data directory and a third-party sync app for Android like [Syncthing](https://syncthing.net/), Nextcloud Sync or FolderSync for other cloud services.
+- Made checkboxes in preview mode toggleable (#37)
+- Added support for Wiki-style links like `[[My Note]]` (#38)
 
 ## 1.0.0
 
@@ -35,6 +28,18 @@ I recommend using an external data directory and a third-party sync app for Andr
 
 - Disabled the preview feature on Android 4.4 KitKat devices.
 - Removed WebDav sync
+
+## Important Changes in Version 0.2.0 
+
+The app has been renamed from `Notable Mobile` to `Noteless` on 02.07.2020.
+
+If you used an earlier Alpha Version, you need to uninstall the old one and install one of the new APKs (Don't forget to backup your notes!)
+
+This is because the app also has a new package name: `net.redsolver.noteless`.
+
+Also I decided to drop support for syncing notes directly via the app because there are alternative options which work a lot better.
+
+I recommend using an external data directory and a third-party sync app for Android like [Syncthing](https://syncthing.net/), Nextcloud Sync or FolderSync for other cloud services.
 
 ## 0.2.0
 
