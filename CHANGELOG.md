@@ -4,6 +4,7 @@
 
 - Added AsciiMath support
 - Added experimental option: Automatic bullet points
+- Added optional single line break syntax
 - Increased height of editor toolbar
 - Changed behaviour of list-button in editor toolbar
 - Fixed image sizing in preview

@@ -7,6 +7,7 @@ import 'package:app/page/note_list.dart';
 import 'package:app/provider/theme.dart';
 import 'package:app/store/notes.dart';
 import 'package:app/store/persistent.dart';
+import 'package:markd/markdown.dart';
 import 'package:preferences/preference_service.dart';
 
 import 'package:provider/provider.dart';
@@ -15,6 +16,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:markd/markdown.dart' as markd;
+
+import 'package:markd/src/ast.dart' as markd_ast;
 
 class PreviewPage extends StatefulWidget {
   final NotesStore store;
@@ -172,6 +175,11 @@ renderMathInElement(document.body,
         markd.markdownToHtml(
           content,
           extensionSet: markd.ExtensionSet.gitHubWeb,
+          inlineSyntaxes: [
+            if (PrefService.getBool('single_line_break_syntax') ?? false)
+              SingleLineBreakSyntax(),
+          ],
+          /* blockSyntaxes: [FencedCodeBlockSyntax()], */
         ) +
         '''
 <script src="$staticPreviewDir/mermaid.min.js"></script>
@@ -348,5 +356,17 @@ renderMathInElement(document.body,
               searchText: search,
               isFirstPage: false,
             )));
+  }
+}
+
+/// Represents a hard line break.
+class SingleLineBreakSyntax extends InlineSyntax {
+  SingleLineBreakSyntax() : super(r'\n');
+
+  /// Create a void <br> element.
+  @override
+  bool onMatch(InlineParser parser, Match match) {
+    parser.addNode(markd_ast.Element.empty('br'));
+    return true;
   }
 }

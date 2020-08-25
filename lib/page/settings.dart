@@ -189,6 +189,13 @@ class _SettingsPageState extends State<SettingsPage> {
           'Search content of notes',
           'search_content',
         ),
+        PreferenceTitle('Preview'),
+        SwitchPreference(
+          'Enable single line break syntax',
+          'single_line_break_syntax',
+          desc:
+              'When enabled, single line breaks are rendered as real line breaks',
+        ),
         /*        PreferenceTitle('Sync'),
         RadioPreference(
           'No Sync',
