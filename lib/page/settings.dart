@@ -62,6 +62,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 .updateTheme('dark');
           },
         ),
+        RadioPreference(
+          'Black / AMOLED',
+          'black',
+          'theme',
+          onSelect: () {
+            Provider.of<ThemeNotifier>(context, listen: false)
+                .updateTheme('black');
+          },
+        ),
         ListTile(
           title: Text('Accent Color'),
           trailing: Padding(

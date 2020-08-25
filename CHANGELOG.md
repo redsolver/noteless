@@ -3,6 +3,7 @@
 ## master
 
 - Added AsciiMath support
+- Added Black/AMOLED theme
 - Added experimental option: Automatic bullet points
 - Added optional single line break syntax
 - Increased height of editor toolbar

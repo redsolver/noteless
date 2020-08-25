@@ -22,10 +22,18 @@ class ThemeNotifier with ChangeNotifier {
       case 'dark':
         currentTheme = ThemeType.dark;
         break;
+      case 'black':
+        currentTheme = ThemeType.dark;
+        break;
     }
     _currentThemeData = ThemeData(
       brightness:
           currentTheme == ThemeType.light ? Brightness.light : Brightness.dark,
+      scaffoldBackgroundColor: theme == 'black' ? Colors.black : null,
+      backgroundColor: theme == 'black' ? Colors.black : null,
+      dialogBackgroundColor: theme == 'black' ? Colors.black : null,
+      canvasColor: theme == 'black' ? Colors.black : null,
+      cardColor: theme == 'black' ? Colors.black : null,
       accentColor: _accentColor,
       primaryColor: _accentColor,
       toggleableActiveColor: _accentColor,
