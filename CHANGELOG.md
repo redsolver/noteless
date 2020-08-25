@@ -8,6 +8,7 @@
 - Increased height of editor toolbar
 - Changed behaviour of list-button in editor toolbar
 - Fixed image sizing in preview
+- Fixed text field submitting when adding a tag
 
 ## 1.1.1
 

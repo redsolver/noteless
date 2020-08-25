@@ -328,6 +328,9 @@ class _EditPageState extends State<EditPage> {
                                 content: TextField(
                                   controller: ctrl,
                                   autofocus: true,
+                                  onSubmitted: (str) {
+                                    Navigator.of(context).pop(str);
+                                  },
                                 ),
                                 actions: <Widget>[
                                   FlatButton(

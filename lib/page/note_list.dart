@@ -667,6 +667,12 @@ class _NoteListPageState extends State<NoteListPage> {
                                                         title: Text('Add Tag'),
                                                         content: TextField(
                                                           controller: ctrl,
+                                                          autofocus: true,
+                                                          onSubmitted: (str) {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(str);
+                                                          },
                                                         ),
                                                         actions: <Widget>[
                                                           FlatButton(
