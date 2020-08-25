@@ -14,7 +14,7 @@ Compatible with notes saved in [Notable](https://notable.app/)
 ## Features
 
 * Markdown-optimized editor with syntax highlighting
-* Supports Github Flavored Markdown, KaTeX and mermaidjs for diagrams
+* Supports Github Flavored Markdown, AsciiMath, KaTeX and mermaidjs for diagrams
 * Tags for organizing your notes
 * Pin, Star and sort your notes by title or different dates
 * Very themable - dark/light mode and accent color
