@@ -1,5 +1,13 @@
 # Changelog
 
+## master
+
+- Added AsciiMath support
+- Added experimental option: Automatic bullet points
+- Increased height of editor toolbar
+- Changed behaviour of list-button in editor toolbar
+- Fixed image sizing in preview
+
 ## 1.1.1
 
 - Added support for spaces in links (#36)

@@ -1,7 +1,5 @@
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_i18n/flutter_i18n_delegate.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:preferences/preference_service.dart';
 
 import 'package:app/page/note_list.dart';
@@ -46,11 +44,11 @@ class App extends StatelessWidget {
       home: NoteListPage(
         isFirstPage: true,
       ),
-      localizationsDelegates: [
+/*       localizationsDelegates: [
         FlutterI18nDelegate(path: 'assets/i18n', fallbackFile: 'en'),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate
-      ],
+      ], */
       /* debugShowCheckedModeBanner: false, */
     );
   }

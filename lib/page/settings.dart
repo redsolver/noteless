@@ -280,6 +280,12 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         PreferenceTitle('Experimental'),
         SwitchPreference(
+          'Automatic bullet points',
+          'auto_bullet_points',
+          desc:
+              'Adds a bullet point to a new line if the line before it had one',
+        ),
+        SwitchPreference(
           'Show virtual tags',
           'notes_list_virtual_tags',
           desc:

@@ -520,21 +520,25 @@ class _EditPageState extends State<EditPage> {
                                       }, */
                                       /* onBackSpacePress:
                                           (TextEditingValue oldValue) {}, */
-                                      /*     onEnterPress:
-                                          (TextEditingValue oldValue) {
-                                        var result = _syntaxHighlighterBase
-                                            .onEnterPress(oldValue);
-                                        if (result != null) {
-                                          _rec.value = result;
-                                        }
-                                      }, */
+                                      onEnterPress: (PrefService.getBool(
+                                                  'auto_bullet_points') ??
+                                              false)
+                                          ? (TextEditingValue oldValue) {
+                                              var result =
+                                                  _syntaxHighlighterBase
+                                                      .onEnterPress(oldValue);
+                                              if (result != null) {
+                                                _rec.value = result;
+                                              }
+                                            }
+                                          : null,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                             Container(
-                              height: 32,
+                              height: 42,
                               color: Theme.of(context).dividerColor,
                               child: Material(
                                 color: Colors.transparent,
@@ -682,19 +686,36 @@ class _EditPageState extends State<EditPage> {
                                             final before =
                                                 _rec.text.substring(0, start);
 
-                                            if (startOfLine.startsWith('-')) {
-                                              int length = 1;
+                                            if (startOfLine
+                                                .trimLeft()
+                                                .startsWith('- ')) {
+                                              int lengthDiff =
+                                                  startOfLine.length;
 
-                                              if (startOfLine.startsWith('- '))
-                                                length++;
-                                              _rec.text = before +
-                                                  startOfLine
-                                                      .substring(1)
-                                                      .trimLeft();
-                                              _rec.selection = TextSelection(
-                                                  baseOffset: oldStart - length,
-                                                  extentOffset:
-                                                      oldStart - length);
+                                              lengthDiff = lengthDiff -
+                                                  (startOfLine
+                                                      .trimLeft()
+                                                      .length);
+
+                                              if (lengthDiff >= 8) {
+                                                _rec.text = before +
+                                                    startOfLine
+                                                        .trimLeft()
+                                                        .substring(2);
+                                                _rec.selection = TextSelection(
+                                                    baseOffset: oldStart -
+                                                        2 -
+                                                        lengthDiff,
+                                                    extentOffset: oldStart -
+                                                        2 -
+                                                        lengthDiff);
+                                              } else {
+                                                _rec.text =
+                                                    before + '  ' + startOfLine;
+                                                _rec.selection = TextSelection(
+                                                    baseOffset: oldStart + 2,
+                                                    extentOffset: oldStart + 2);
+                                              }
                                             } else {
                                               _rec.text =
                                                   before + '- ' + startOfLine;

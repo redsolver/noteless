@@ -50,7 +50,69 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
 
   @override
   TextEditingValue onEnterPress(TextEditingValue oldValue) {
-/*     int oldStart = oldValue.selection.start;
+    int oldStart = oldValue.selection.start;
+
+    final bef = oldValue.text.substring(0, oldStart - 1);
+
+    String befLine = bef.split('\n').last;
+
+    int trimSpace = befLine.length;
+
+    befLine = befLine.trimLeft();
+
+    trimSpace = trimSpace - befLine.length;
+
+    if (befLine.startsWith('- ') || befLine.startsWith('* ')) {
+      if (befLine.length <= 2) {
+        if (trimSpace == 0) {
+          var newValue = oldValue.copyWith(
+            text: bef.substring(0, oldStart - 3) +
+                '\n\n' +
+                oldValue.text.substring(oldStart + 1),
+            composing: TextRange(start: -1, end: -1),
+            selection: TextSelection.fromPosition(
+              TextPosition(
+                  affinity: TextAffinity.upstream, offset: bef.length - 1),
+            ),
+          );
+
+          return newValue;
+        } else {
+          var newValue = oldValue.copyWith(
+            text: oldValue.text.substring(0, oldStart - 1 - 4) +
+                oldValue.text.substring(oldStart - 3, oldStart) +
+                oldValue.text.substring(oldStart + 1),
+            composing: TextRange(start: -1, end: -1),
+            selection: TextSelection.fromPosition(
+              TextPosition(
+                  affinity: TextAffinity.upstream, offset: bef.length - 2),
+            ),
+          );
+
+          return newValue;
+        }
+      }
+
+      String sym = befLine.startsWith('* ') ? '*' : '-';
+
+      for (int i = 0; i < trimSpace; i++) {
+        sym = ' ' + sym;
+      }
+
+      var newValue = oldValue.copyWith(
+        text: bef + '\n$sym \n' + oldValue.text.substring(oldStart + 1),
+        composing: TextRange(start: -1, end: -1),
+        selection: TextSelection.fromPosition(
+          TextPosition(
+              affinity: TextAffinity.upstream,
+              offset: bef.length + 3 + trimSpace),
+        ),
+      );
+
+      return newValue;
+    }
+
+    return null;
 
     int start = oldStart;
 
@@ -91,8 +153,6 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
       return newValue;
     } else {}
     return oldValue;
-    //var padding = "    ";
-    var newText = oldValue.text; */
   }
 
   @override
@@ -127,6 +187,25 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
 
         return;
       }
+
+      int lengthDiff = text.length;
+
+      text = text.trimLeft();
+
+      lengthDiff = lengthDiff - text.length;
+
+      String lineStart = '';
+
+      for (int i = 0; i < lengthDiff; i++) {
+        lineStart += ' ';
+      }
+
+      if (lineStart != null)
+        lsSpans.add(
+          TextSpan(
+            text: lineStart,
+          ),
+        );
 
       addPrefix(String prefix) {
         lsSpans.add(
@@ -234,6 +313,22 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
               match.input.substring(match.start, match.end) +
               '<nless-format-tmp>0');
 
+      // Divider ---
+
+      s = s.replaceAllMapped(
+          RegExp(r'^---$'),
+          (match) =>
+              '<nless-format-tmp>7' +
+              match.input.substring(match.start, match.end) +
+              '<nless-format-tmp>0');
+
+      s = s.replaceAllMapped(
+          RegExp(r'^\*\*\*$'),
+          (match) =>
+              '<nless-format-tmp>7' +
+              match.input.substring(match.start, match.end) +
+              '<nless-format-tmp>0');
+
       // KaTeX
 
       s = s.replaceAllMapped(
@@ -245,6 +340,22 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
 
       s = s.replaceAllMapped(
           RegExp(r'\$\$[^\$]+\$\$'),
+          (match) =>
+              '<nless-format-tmp>4' +
+              match.input.substring(match.start, match.end) +
+              '<nless-format-tmp>0');
+
+      // AsciiMath
+
+      s = s.replaceAllMapped(
+          RegExp(r'(?<![\w&])&[^&]+&(?![\w&])'),
+          (match) =>
+              '<nless-format-tmp>4' +
+              match.input.substring(match.start, match.end) +
+              '<nless-format-tmp>0');
+
+      s = s.replaceAllMapped(
+          RegExp(r'&&[^&]+&&'),
           (match) =>
               '<nless-format-tmp>4' +
               match.input.substring(match.start, match.end) +
@@ -306,7 +417,6 @@ class NotelessSyntaxHighlighter implements SyntaxHighlighterBase {
         } */
       }
 
-      // TODO Handle spaces correctly - blocked by https://github.com/flutter/flutter/issues/40095
 
       if (i < texts.length) {
         lsSpans.add(TextSpan(text: '\n'));

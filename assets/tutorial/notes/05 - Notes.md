@@ -41,9 +41,13 @@ The [mhchem](https://mhchem.github.io/MathJax-mhchem) syntax for writing chemica
 
 $$\ce{ SO4^2- + Ba^2+ -> BaSO4 v }$$
 
-> **Note**: In order to minimize conflicts there mustn't be spaces at the beginning and end of a single-line formula, and the ending `$` character musn't be followed by a digit. If you need to you can escape the `$` character with a backslash.
+#### AsciiMath
 
-> **Note**: If your formula contains a `$`, you will have to wrap it in either double `$$` or a code block in order to avoid clonflicts.
+Wrap a formula in `&&` to display it as a block:
+
+&&sum_(i=1)^n i^3=((n(n+1))/2)^2&&
+
+Wrap it in `&` to display it inline: &e = mc^2&.
 
 #### mermaid
 

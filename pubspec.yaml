@@ -11,7 +11,7 @@ description: A markdown note-taking app for mobile devices.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.1.1+111
+version: 1.2.0+120
 
 environment:
   sdk: ">=2.5.0 <3.0.0"
@@ -29,7 +29,7 @@ dependencies:
   # flutter_widget_from_html: ^0.3.3
   bsdiff: ^0.1.0
   webview_flutter: ^0.3.19+9
-  flutter_i18n: ^0.7.0
+  # flutter_i18n: ^0.7.0
   preferences: ^5.2.0
   yamlicious: ^0.1.0
   html: ^0.14.0+2
@@ -72,7 +72,7 @@ flutter:
   assets:
     - assets/tutorial/notes/
     - assets/tutorial/attachments/
-    - assets/i18n/
+#    - assets/i18n/
     - assets/preview/fonts/
     - assets/preview/
 

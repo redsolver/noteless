@@ -16,7 +16,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:markd/markdown.dart' as markd;
 
-
 class PreviewPage extends StatefulWidget {
   final NotesStore store;
   final String textContent;
@@ -138,16 +137,31 @@ class _PreviewPageState extends State<PreviewPage> {
 
   <script defer src="$staticPreviewDir/mhchem.min.js"></script>
 
+  <script src="$staticPreviewDir/asciimath2tex.umd.js" ></script>
+
+
 
     <!-- KaTeX auto-render extension -->
     <script defer src="$staticPreviewDir/katex.auto-render.min.js"
-        onload="renderMathInElement(document.body, 
+        onload="const parser = new AsciiMathParser();renderMathInElement(document.body, 
         {delimiters:
         [
           {left: '\$\$', right: '\$\$', display: true},
-          {left: '\$', right: '\$', display: false}
+          {left: '\$', right: '\$', display: false},
         ],
-        preProcess: (math)=>math.trim()
+        preProcess: (math)=>{
+          return math.trim();
+        }
+        });
+renderMathInElement(document.body, 
+        {delimiters:
+        [
+          {left: '&&', right: '&&', display: true},
+          {left: '&', right: '&', display: false},
+        ],
+        preProcess: (math)=>{
+          return parser.parse(math.trim());
+        }
         });
 "></script>
 
@@ -191,6 +205,9 @@ class _PreviewPageState extends State<PreviewPage> {
             PrefService.getString('notable_attachments_directory') +
             '/');
 
+    generatedPreview =
+        generatedPreview.replaceAll('<img ', '<img width="100%" ');
+
     int checkboxIndex = -1;
 
     generatedPreview = generatedPreview.replaceAllMapped(
@@ -198,8 +215,7 @@ class _PreviewPageState extends State<PreviewPage> {
       checkboxIndex++;
 
       return 'class="todo" type="checkbox" onclick="notelesscheckbox.postMessage( this.checked + \'-$checkboxIndex\');"';
-    }
-        );
+    });
 
     await previewFile.writeAsString(generatedPreview);
 
