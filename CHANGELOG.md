@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 1.2.0
 
 - Added AsciiMath support
 - Added Black/AMOLED theme

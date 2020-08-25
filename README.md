@@ -56,6 +56,17 @@ Compatible with notes saved in [Notable](https://notable.app/)
 
 ## Changelog
 
+### 1.2.0
+
+- Added AsciiMath support
+- Added Black/AMOLED theme
+- Added experimental option: Automatic bullet points
+- Added optional single line break syntax
+- Increased height of editor toolbar
+- Changed behaviour of list-button in editor toolbar
+- Fixed image sizing in preview
+- Fixed text field submitting when adding a tag
+
 ### 1.1.1
 
 - Added support for spaces in links (#36)
