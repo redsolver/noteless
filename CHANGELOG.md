@@ -1,5 +1,9 @@
 # Changelog
 
+## master
+
+- Added proper table borders
+
 ## 1.2.0
 
 - Added AsciiMath support

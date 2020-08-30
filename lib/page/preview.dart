@@ -168,7 +168,19 @@ renderMathInElement(document.body,
         });
 "></script>
 
+<style>
+table {
+  border-collapse: collapse;
+}
 
+table, th, td {
+  border: 1px solid ${theme.brightness == Brightness.light ? 'lightgrey' : 'grey'};
+}
+
+th, td {
+  padding: 4px;
+}
+</style>
 </head>
 <body>
                       ''' +
@@ -215,6 +227,8 @@ renderMathInElement(document.body,
 
     generatedPreview =
         generatedPreview.replaceAll('<img ', '<img width="100%" ');
+
+    // print(generatedPreview.split('<body>')[1]);
 
     int checkboxIndex = -1;
 
