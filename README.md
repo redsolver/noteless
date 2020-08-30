@@ -56,6 +56,12 @@ Compatible with notes saved in [Notable](https://notable.app/)
 
 ## Changelog
 
+### 1.2.1
+
+- Added Android App Shortcut for creating a new note from the homescreen
+- Added proper table borders
+- Fixed some bugs
+
 ### 1.2.0
 
 - Added AsciiMath support

@@ -59,7 +59,7 @@ class _NoteListPageState extends State<NoteListPage> {
           const ShortcutItem(
               type: 'action_create_note',
               localizedTitle: 'Create note',
-              icon: 'note_plus_outline'),
+              icon: 'ic_shortcut_add'),
         ]);
 
 /*         // For sharing or opening urls/text coming from outside the app while the app is in the memory

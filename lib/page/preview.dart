@@ -180,6 +180,11 @@ table, th, td {
 th, td {
   padding: 4px;
 }
+
+pre {
+  max-width: 100%;
+  overflow-x: scroll;
+}
 </style>
 </head>
 <body>

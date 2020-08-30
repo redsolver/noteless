@@ -1,6 +1,6 @@
 # Changelog
 
-## master
+## 1.2.1
 
 - Added Android App Shortcut for creating a new note from the homescreen
 - Added proper table borders
