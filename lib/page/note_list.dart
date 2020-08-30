@@ -10,6 +10,7 @@ import 'package:app/store/persistent.dart';
 import 'package:package_info/package_info.dart';
 import 'package:preferences/preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 import 'about.dart';
 
@@ -42,7 +43,20 @@ class _NoteListPageState extends State<NoteListPage> {
     }
 
     store.init();
-    _load().then((_) => _refresh());
+    _load().then((_) {
+      final quickActions = QuickActions();
+      quickActions.initialize((shortcutType) {
+        if (shortcutType == 'action_create_note') {
+          createNewNote();
+        }
+      });
+      quickActions.setShortcutItems(<ShortcutItem>[
+        const ShortcutItem(
+            type: 'action_create_note',
+            localizedTitle: 'Create note',
+            icon: 'note_plus_outline'),
+      ]);
+    });
 
     super.initState();
   }
@@ -485,46 +499,7 @@ class _NoteListPageState extends State<NoteListPage> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () async {
-            Note newNote = Note();
-            int i = 1;
-            while (true) {
-              String title = 'Untitled';
-              if (i > 1) title += ' ($i)';
-
-              bool exists = false;
-              print(i);
-              for (Note note in store.allNotes) {
-                if (title == note.title) {
-                  exists = true;
-                  break;
-                }
-              }
-              print(i);
-              if (!exists) {
-                newNote.title = title;
-                break;
-              }
-              print(i);
-
-              i++;
-            }
-
-            newNote.created = DateTime.now();
-            newNote.modified = newNote.created;
-
-            newNote.file = File('${store.notesDir.path}/${newNote.title}.md');
-            store.allNotes.add(newNote);
-
-            _filterAndSortNotes();
-
-            await PersistentStore.saveNote(newNote, '# ${newNote.title}\n\n');
-
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => EditPage(
-                      newNote,
-                      store,
-                      autofocus: true,
-                    )));
+            createNewNote();
           },
         ),
         bottomNavigationBar: _selectedNotes.isEmpty
@@ -949,6 +924,50 @@ class _NoteListPageState extends State<NoteListPage> {
               )),
       ),
     );
+  }
+
+  Future<void> createNewNote() async {
+    Note newNote = Note();
+    int i = 1;
+    while (true) {
+      String title = 'Untitled';
+      if (i > 1) title += ' ($i)';
+
+      bool exists = false;
+      print(i);
+      for (Note note in store.allNotes) {
+        if (title == note.title) {
+          exists = true;
+          break;
+        }
+      }
+      print(i);
+      if (!exists) {
+        newNote.title = title;
+        break;
+      }
+      print(i);
+
+      i++;
+    }
+
+    newNote.created = DateTime.now();
+    newNote.modified = newNote.created;
+
+    newNote.file = File('${store.notesDir.path}/${newNote.title}.md');
+    store.allNotes.add(newNote);
+
+    _filterAndSortNotes();
+
+    await PersistentStore.saveNote(newNote, '# ${newNote.title}\n\n');
+
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => EditPage(
+              newNote,
+              store,
+              autofocus: true,
+            )));
+    _filterAndSortNotes();
   }
 
   Set<String> _selectedNotes = {};
