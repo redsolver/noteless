@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:package_info/package_info.dart';
 import 'package:preferences/preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:quick_actions/quick_actions.dart';
+// import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'about.dart';
 
@@ -31,6 +33,8 @@ class _NoteListPageState extends State<NoteListPage> {
   TextEditingController _searchFieldCtrl = TextEditingController();
   bool searching = false;
 
+  // StreamSubscription _intentDataStreamSubscription;
+
   @override
   void initState() {
     store.currTag =
@@ -44,21 +48,44 @@ class _NoteListPageState extends State<NoteListPage> {
 
     store.init();
     _load().then((_) {
-      final quickActions = QuickActions();
-      quickActions.initialize((shortcutType) {
-        if (shortcutType == 'action_create_note') {
-          createNewNote();
-        }
-      });
-      quickActions.setShortcutItems(<ShortcutItem>[
-        const ShortcutItem(
-            type: 'action_create_note',
-            localizedTitle: 'Create note',
-            icon: 'note_plus_outline'),
-      ]);
+      if (widget.isFirstPage) {
+        final quickActions = QuickActions();
+        quickActions.initialize((shortcutType) {
+          if (shortcutType == 'action_create_note') {
+            createNewNote();
+          }
+        });
+        quickActions.setShortcutItems(<ShortcutItem>[
+          const ShortcutItem(
+              type: 'action_create_note',
+              localizedTitle: 'Create note',
+              icon: 'note_plus_outline'),
+        ]);
+
+/*         // For sharing or opening urls/text coming from outside the app while the app is in the memory
+        _intentDataStreamSubscription =
+            ReceiveSharingIntent.getTextStream().listen((String value) {
+          print('SHARED $value');
+          ReceiveSharingIntent.reset();
+        }, onError: (err) {
+          print("getLinkStream error: $err");
+        });
+
+        // For sharing or opening urls/text coming from outside the app while the app is closed
+        ReceiveSharingIntent.getInitialText().then((String value) {
+          print('SHARED $value');
+          ReceiveSharingIntent.reset();
+        }); */
+      }
     });
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // _intentDataStreamSubscription.cancel();
+    super.dispose();
   }
 
   Future<bool> _onWillPop() async {
@@ -242,7 +269,7 @@ class _NoteListPageState extends State<NoteListPage> {
             ? LinearProgressIndicator()
             : RefreshIndicator(
                 onRefresh: () async {
-                  await _refresh();
+                  await _load();
                 },
                 child: Scrollbar(
                   child: ListView(
