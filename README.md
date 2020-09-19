@@ -6,6 +6,7 @@ A markdown-based note-taking app for Android
 
 [![Google Play](https://img.shields.io/endpoint?style=for-the-badge&color=orange&logo=google-play&logoColor=orange&url=https%3A%2F%2Fplayshields.herokuapp.com%2Fplay%3Fi%3Dnet.redsolver.noteless%26l%3DGoogle%2520Play%26m%3D%24version)](https://play.google.com/store/apps/details?id=net.redsolver.noteless)
 [![GitHub All Releases](https://img.shields.io/github/downloads/redsolver/noteless/total?style=for-the-badge)](https://github.com/redsolver/noteless/releases)
+[![SkyDroid Download](https://img.shields.io/badge/SkyDroid-Download-blueviolet?style=for-the-badge&logo=android)](https://to.skydroid.app/noteless.redsolver)
 [![Chat on Matrix](https://img.shields.io/matrix/noteless:matrix.org?style=for-the-badge)](https://matrix.to/#/#noteless:matrix.org)
 ![MIT License](https://img.shields.io/github/license/redsolver/noteless?style=for-the-badge)
 

@@ -1,0 +1,72 @@
+categories:
+  - Writing
+license: MIT
+authorName: redsolver
+authorEmail: info@redsolver.net
+sourceCode: https://github.com/redsolver/noteless
+issueTracker: https://github.com/redsolver/noteless/issues
+changelog: https://github.com/redsolver/noteless/blob/HEAD/CHANGELOG.md
+
+name: Noteless
+packageName: net.redsolver.noteless
+
+icon: https://github.com/redsolver/noteless/raw/master/assets/icon/icon.png
+
+localized:
+  en-US:
+    description: |-
+      Features
+
+      * Markdown-optimized editor with syntax highlighting
+      * Supports Github Flavored Markdown, KaTeX and mermaidjs for diagrams
+      * Tags for organizing your notes
+      * Pin, Star and sort your notes by title or different dates
+      * Very themable - dark/light mode and accent color
+      * Full-text search
+      * File Attachments that can be embedded into a note
+      * Multi-Note Editing
+      * Slide actions for easier editing
+      * Tutorial notes which explain how to use the app
+    summary: A markdown note-taking app for mobile devices.
+    whatsNew: |-
+      - Made checkboxes in preview mode toggleable
+      - Added support for Wiki-style links like [[My Note]]
+      - Added support for spaces in links
+    phoneScreenshotsBaseUrl: https://github.com/redsolver/noteless/raw/master/screenshots/
+    phoneScreenshots:
+      - screen1.png
+      - screen2.png
+      - screen3.png
+      - screen4.png
+      - screen5.png
+      - screen6.png
+      - screen7.png
+      - screen8.png
+      - screen9.png
+      - screen10.png
+      - screen11.png
+      - screen12.png
+
+builds:
+  - versionName: 0.3.2
+    versionCode: 32
+    sha256: 0a5d15f00554e982e37ed9bdda41d17304e8f056913a8d0921a11d81844578e9
+    apkLink: sia://AADTpnQ7qv4aFsJYTJECT8e8428kGgLmwLUWgqdycvquFg
+  - versionName: 1.0.0
+    versionCode: 100
+    sha256: d56dccb20c45e84089560a8d7611eeb9a55a15647fa06aee822364f39c753a69
+    apkLink: sia://AABBdXkn8Ogia55qK2vvYLRecYY2U-sKyTx0SoD8c6DOKQ
+  - versionName: 1.1.1
+    versionCode: 111
+    sha256: c4bb26d2755dbdd5855684454e82d4691d1e61a6b893cdc360fd18aaf954763e
+    apkLink: sia://AADVS_d1T9RZMdqifMKK8mHrqGcYcGYT6wjwi0VxUnj5DA
+  - versionName: 1.2.1
+    versionCode: 121
+    sha256: d45235776d7ce1720a90e18dbf4937188eee442279998a13214b31d62ddaf6f5
+    apkLink: sia://AADXh9owFYA9k2woHWDB3wA296xf-jRsKI_2-DtNUrUNuA
+
+currentVersionName: 1.2.1
+currentVersionCode: 121
+
+added: 1596499200000
+lastUpdated: 1599338341000
