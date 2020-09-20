@@ -185,6 +185,14 @@ pre {
   max-width: 100%;
   overflow-x: scroll;
 }
+
+blockquote{
+  padding: 0em 0em 0em .6em;
+  margin-left: .1em;
+  border-left: 0.3em solid ${theme.brightness == Brightness.light ? 'lightgrey' : 'grey'};
+}
+
+
 </style>
 </head>
 <body>

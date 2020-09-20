@@ -12,6 +12,7 @@ import 'package:package_info/package_info.dart';
 import 'package:preferences/preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 // import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'about.dart';
@@ -33,7 +34,7 @@ class _NoteListPageState extends State<NoteListPage> {
   TextEditingController _searchFieldCtrl = TextEditingController();
   bool searching = false;
 
-  // StreamSubscription _intentDataStreamSubscription;
+  StreamSubscription _intentDataStreamSubscription;
 
   @override
   void initState() {
@@ -62,10 +63,10 @@ class _NoteListPageState extends State<NoteListPage> {
               icon: 'ic_shortcut_add'),
         ]);
 
-/*         // For sharing or opening urls/text coming from outside the app while the app is in the memory
+        // For sharing or opening urls/text coming from outside the app while the app is in the memory
         _intentDataStreamSubscription =
             ReceiveSharingIntent.getTextStream().listen((String value) {
-          print('SHARED $value');
+          handleSharedText(value);
           ReceiveSharingIntent.reset();
         }, onError: (err) {
           print("getLinkStream error: $err");
@@ -73,9 +74,9 @@ class _NoteListPageState extends State<NoteListPage> {
 
         // For sharing or opening urls/text coming from outside the app while the app is closed
         ReceiveSharingIntent.getInitialText().then((String value) {
-          print('SHARED $value');
+          handleSharedText(value);
           ReceiveSharingIntent.reset();
-        }); */
+        });
       }
     });
 
@@ -84,8 +85,34 @@ class _NoteListPageState extends State<NoteListPage> {
 
   @override
   void dispose() {
-    // _intentDataStreamSubscription.cancel();
+    _intentDataStreamSubscription.cancel();
     super.dispose();
+  }
+
+  handleSharedText(String value) {
+    if (value == null) return;
+
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Received text'),
+              content:
+                  Scrollbar(child: SingleChildScrollView(child: Text(value))),
+              actions: [
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Cancel')),
+                // FlatButton(onPressed: () {}, child: Text('Append to note')),
+                FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      createNewNote(value);
+                    },
+                    child: Text('Create new note')),
+              ],
+            ));
   }
 
   Future<bool> _onWillPop() async {
@@ -953,7 +980,7 @@ class _NoteListPageState extends State<NoteListPage> {
     );
   }
 
-  Future<void> createNewNote() async {
+  Future<void> createNewNote([String content = '']) async {
     Note newNote = Note();
     int i = 1;
     while (true) {
@@ -986,7 +1013,7 @@ class _NoteListPageState extends State<NoteListPage> {
 
     _filterAndSortNotes();
 
-    await PersistentStore.saveNote(newNote, '# ${newNote.title}\n\n');
+    await PersistentStore.saveNote(newNote, '# ${newNote.title}\n\n$content');
 
     await Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => EditPage(

@@ -21,7 +21,7 @@
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -38,11 +38,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             
-<!--             <intent-filter>
+            <intent-filter>
                <action android:name="android.intent.action.SEND" />
                <category android:name="android.intent.category.DEFAULT" />
                <data android:mimeType="text/*" />
-            </intent-filter> -->
+            </intent-filter>
         </activity>
     </application>
 </manifest>

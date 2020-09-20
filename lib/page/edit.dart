@@ -48,6 +48,8 @@ class _EditPageState extends State<EditPage> {
 
   bool _previewEnabled = false;
 
+  TextSelection _textSelectionCache;
+
   @override
   void initState() {
     note = widget.note;
@@ -240,7 +242,12 @@ class _EditPageState extends State<EditPage> {
                         },
                       )),
               PopupMenuButton<String>(
+                onCanceled: () {
+                  _rec.selection = _textSelectionCache;
+                },
                 onSelected: (String result) async {
+                  _rec.selection = _textSelectionCache;
+
                   int divIndex = result.indexOf('.');
                   if (divIndex == -1) divIndex = result.length;
 
@@ -279,9 +286,28 @@ class _EditPageState extends State<EditPage> {
                         }
                         await file.copy(newFile.path);
 
-                        note.attachments.add(newFile.path.split('/').last);
+                        final attachmentName = newFile.path.split('/').last;
+
+                        note.attachments.add(attachmentName);
 
                         await file.delete();
+
+                        int start = _rec.selection.start;
+
+                        final insert = '![](@attachment/$attachmentName)';
+
+                        _rec.text = _rec.text.substring(
+                              0,
+                              start,
+                            ) +
+                            insert +
+                            _rec.text.substring(
+                              start,
+                            );
+
+                        _rec.selection = TextSelection(
+                            baseOffset: start,
+                            extentOffset: start + insert.length);
                       }
 
                       break;
@@ -388,100 +414,105 @@ class _EditPageState extends State<EditPage> {
                   }
                   PersistentStore.saveNote(note);
                 },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    value: 'favorite',
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          note.favorited ? MdiIcons.starOff : MdiIcons.star,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(note.favorited ? 'Unfavorite' : 'Favorite'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<String>(
-                    value: 'pin',
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          note.pinned ? MdiIcons.pinOff : MdiIcons.pin,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text(note.pinned ? 'Unpin' : 'Pin'),
-                      ],
-                    ),
-                  ),
-                  for (String attachment in note.attachments)
+                itemBuilder: (BuildContext context) {
+                  _textSelectionCache = _rec.selection;
+                  return <PopupMenuEntry<String>>[
                     PopupMenuItem<String>(
-                      value: 'removeAttachment.$attachment',
+                      value: 'favorite',
                       child: Row(
                         children: <Widget>[
                           Icon(
-                            MdiIcons.paperclip,
+                            note.favorited ? MdiIcons.starOff : MdiIcons.star,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           SizedBox(
                             width: 8,
                           ),
-                          Text(attachment),
+                          Text(note.favorited ? 'Unfavorite' : 'Favorite'),
                         ],
                       ),
                     ),
-                  PopupMenuItem<String>(
-                    value: 'addAttachment',
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          MdiIcons.filePlus,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text('Add Attachment'),
-                      ],
-                    ),
-                  ),
-                  for (String tag in note.tags)
                     PopupMenuItem<String>(
-                      value: 'removeTag.$tag',
+                      value: 'pin',
                       child: Row(
                         children: <Widget>[
                           Icon(
-                            MdiIcons.tag,
+                            note.pinned ? MdiIcons.pinOff : MdiIcons.pin,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           SizedBox(
                             width: 8,
                           ),
-                          Text(tag),
+                          Text(note.pinned ? 'Unpin' : 'Pin'),
                         ],
                       ),
                     ),
-                  PopupMenuItem<String>(
-                    value: 'addTag',
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          MdiIcons.tagPlus,
-                          color: Theme.of(context).colorScheme.onSurface,
+                    for (String attachment in note.attachments)
+                      PopupMenuItem<String>(
+                        value: 'removeAttachment.$attachment',
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              MdiIcons.paperclip,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Flexible(
+                              child: Text(attachment),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text('Add Tag'),
-                      ],
+                      ),
+                    PopupMenuItem<String>(
+                      value: 'addAttachment',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            MdiIcons.filePlus,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text('Add Attachment'),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    for (String tag in note.tags)
+                      PopupMenuItem<String>(
+                        value: 'removeTag.$tag',
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              MdiIcons.tag,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(tag),
+                          ],
+                        ),
+                      ),
+                    PopupMenuItem<String>(
+                      value: 'addTag',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            MdiIcons.tagPlus,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text('Add Tag'),
+                        ],
+                      ),
+                    ),
+                  ];
+                },
               )
             ],
           ),

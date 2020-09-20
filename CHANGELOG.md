@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0
+
+- Added feature to create a new note by sharing text with Noteless (#42)
+- Adding an attachment to a note now automatically embeds it
+- Improved blockquote styling (#44)
+- Fixed some bugs
+
 ## 1.2.1
 
 - Added Android App Shortcut for creating a new note from the homescreen
