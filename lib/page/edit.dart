@@ -86,10 +86,15 @@ class _EditPageState extends State<EditPage> {
       }
 
       currentData = _rec.text;
-      if (_saved)
-        setState(() {
-          _saved = false;
-        });
+
+      if (PrefService.getBool('editor_auto_save') ?? false) {
+        autosave();
+      } else {
+        if (_saved)
+          setState(() {
+            _saved = false;
+          });
+      }
     });
 
     if (widget.autofocus) {
@@ -111,6 +116,19 @@ class _EditPageState extends State<EditPage> {
   }
 
   GlobalKey<ScaffoldState> _scaffold = GlobalKey();
+
+  int autoSaveCounter = 0;
+
+  autosave() async {
+    autoSaveCounter++;
+
+    final asf = autoSaveCounter;
+    await Future.delayed(Duration(milliseconds: 500));
+
+    if (asf == autoSaveCounter) {
+      save();
+    }
+  }
 
   Future<bool> _onWillPop() async {
     if (_saved) return true;
@@ -138,6 +156,57 @@ class _EditPageState extends State<EditPage> {
         false;
   }
 
+  Future<void> save() async {
+    String markedTitle = markd.markdownToHtml(
+        RegExp(
+          r'(?<=# ).*',
+        ).stringMatch(currentData),
+        extensionSet: markd.ExtensionSet.gitHubWeb);
+    // print(markedTitle);
+
+    String title = markedTitle.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+    // print(title);
+
+    File oldFile;
+    if (note.title != title) {
+      if (File(PrefService.getString('notable_notes_directory') +
+              '/' +
+              title +
+              '.md')
+          .existsSync()) {
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text('Conflict'),
+                  content: Text('There is already a note with this title.'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Ok'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                ));
+        return;
+      } else {
+        oldFile = note.file;
+        note.file = File(PrefService.getString('notable_notes_directory') +
+            '/' +
+            title +
+            '.md');
+      }
+    }
+
+    note.title = title;
+
+    note.modified = DateTime.now();
+
+    await PersistentStore.saveNote(note, currentData);
+
+    if (oldFile != null) oldFile.deleteSync();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_syntaxHighlighterBase.accentColor == null)
@@ -154,58 +223,7 @@ class _EditPageState extends State<EditPage> {
                 IconButton(
                   icon: Icon(Icons.save),
                   onPressed: () async {
-                    String markedTitle = markd.markdownToHtml(
-                        RegExp(
-                          r'(?<=# ).*',
-                        ).stringMatch(currentData),
-                        extensionSet: markd.ExtensionSet.gitHubWeb);
-                    print(markedTitle);
-
-                    String title =
-                        markedTitle.replaceAll(RegExp(r'<[^>]*>'), '').trim();
-                    print(title);
-
-                    File oldFile;
-                    if (note.title != title) {
-                      if (File(
-                              PrefService.getString('notable_notes_directory') +
-                                  '/' +
-                                  title +
-                                  '.md')
-                          .existsSync()) {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: Text('Conflict'),
-                                  content: Text(
-                                      'There is already a note with this title.'),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      child: Text('Ok'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    )
-                                  ],
-                                ));
-                        return;
-                      } else {
-                        oldFile = note.file;
-                        note.file = File(
-                            PrefService.getString('notable_notes_directory') +
-                                '/' +
-                                title +
-                                '.md');
-                      }
-                    }
-
-                    note.title = title;
-
-                    note.modified = DateTime.now();
-
-                    await PersistentStore.saveNote(note, currentData);
-
-                    if (oldFile != null) oldFile.deleteSync();
+                    await save();
 
                     setState(() {
                       _saved = true;
@@ -350,6 +368,11 @@ class _EditPageState extends State<EditPage> {
 
                       break;
 
+                    case 'trash':
+                      note.deleted = !note.deleted;
+
+                      break;
+
                     case 'addTag':
                       TextEditingController ctrl = TextEditingController();
                       String newTag = await showDialog(
@@ -449,6 +472,25 @@ class _EditPageState extends State<EditPage> {
                             width: 8,
                           ),
                           Text(note.pinned ? 'Unpin' : 'Pin'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'trash',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            note.deleted
+                                ? MdiIcons.deleteRestore
+                                : MdiIcons.delete,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(note.deleted
+                              ? 'Restore from trash'
+                              : 'Move to trash'),
                         ],
                       ),
                     ),
@@ -620,10 +662,17 @@ class _EditPageState extends State<EditPage> {
                                                   if (history.isEmpty) {
                                                     setState(() {});
                                                   }
-                                                  if (_saved)
-                                                    setState(() {
-                                                      _saved = false;
-                                                    });
+
+                                                  if (PrefService.getBool(
+                                                          'editor_auto_save') ??
+                                                      false) {
+                                                    autosave();
+                                                  } else {
+                                                    if (_saved)
+                                                      setState(() {
+                                                        _saved = false;
+                                                      });
+                                                  }
                                                 },
                                         ),
                                       ),

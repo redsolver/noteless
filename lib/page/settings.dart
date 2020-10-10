@@ -30,7 +30,8 @@ class _SettingsPageState extends State<SettingsPage> {
       'search_content': true,
       'editor_mode_switcher': true,
       'notes_list_virtual_tags': false,
-      'debug_logs_sync': false
+      'debug_logs_sync': false,
+      'editor_auto_save': false,
     });
     super.initState();
   }
@@ -190,6 +191,10 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
         PreferenceTitle('Editor'),
         SwitchPreference(
+          'Auto Save',
+          'editor_auto_save',
+        ),
+        SwitchPreference(
           'Use Mode Switcher',
           'editor_mode_switcher',
         ),
@@ -289,11 +294,11 @@ class _SettingsPageState extends State<SettingsPage> {
             }
           },
         ),
-        PreferenceTitle('Debug'),
+        /*        PreferenceTitle('Debug'),
         SwitchPreference(
           'Create sync logfile ',
           'debug_logs_sync',
-        ),
+        ), */
         PreferenceTitle('Experimental'),
         SwitchPreference(
           'Automatic bullet points',

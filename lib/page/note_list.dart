@@ -1013,6 +1013,8 @@ class _NoteListPageState extends State<NoteListPage> {
 
     _filterAndSortNotes();
 
+    PrefService.setBool('editor_mode_switcher_is_preview', false);
+
     await PersistentStore.saveNote(newNote, '# ${newNote.title}\n\n$content');
 
     await Navigator.of(context).push(MaterialPageRoute(
