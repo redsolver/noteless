@@ -368,6 +368,11 @@ class _EditPageState extends State<EditPage> {
 
                       break;
 
+                    case 'trash':
+                      note.deleted = !note.deleted;
+
+                      break;
+
                     case 'addTag':
                       TextEditingController ctrl = TextEditingController();
                       String newTag = await showDialog(
@@ -467,6 +472,25 @@ class _EditPageState extends State<EditPage> {
                             width: 8,
                           ),
                           Text(note.pinned ? 'Unpin' : 'Pin'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'trash',
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            note.deleted
+                                ? MdiIcons.deleteRestore
+                                : MdiIcons.delete,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(note.deleted
+                              ? 'Restore from trash'
+                              : 'Move to trash'),
                         ],
                       ),
                     ),
