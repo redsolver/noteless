@@ -262,7 +262,9 @@ class _EditPageState extends State<EditPage> {
                       break;
 
                     case 'addAttachment':
-                      File file = await FilePicker.getFile();
+                      final result = await FilePicker.platform.pickFiles();
+
+                      File file = File(result.files.first.path);
 
                       if (file != null) {
                         String fullFileName = file.path.split('/').last;
@@ -295,19 +297,22 @@ class _EditPageState extends State<EditPage> {
                         int start = _rec.selection.start;
 
                         final insert = '![](@attachment/$attachmentName)';
+                        try {
+                          _rec.text = _rec.text.substring(
+                                0,
+                                start,
+                              ) +
+                              insert +
+                              _rec.text.substring(
+                                start,
+                              );
 
-                        _rec.text = _rec.text.substring(
-                              0,
-                              start,
-                            ) +
-                            insert +
-                            _rec.text.substring(
-                              start,
-                            );
-
-                        _rec.selection = TextSelection(
-                            baseOffset: start,
-                            extentOffset: start + insert.length);
+                          _rec.selection = TextSelection(
+                              baseOffset: start,
+                              extentOffset: start + insert.length);
+                        } catch (e) {
+                          // TODO Handle this case
+                        }
                       }
 
                       break;
