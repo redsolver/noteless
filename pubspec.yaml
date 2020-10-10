@@ -25,10 +25,9 @@ dependencies:
   material_design_icons_flutter: ^4.0.5045
   markd:
     git: https://github.com/redsolver/markd.git
-  flutter_html: ^1.0.0
   # flutter_widget_from_html: ^0.3.3
   bsdiff: ^0.1.0
-  webview_flutter: ^0.3.19+9
+  webview_flutter: ^1.0.1
   # flutter_i18n: ^0.7.0
   preferences: ^5.2.0
   yamlicious: ^0.1.0
@@ -42,7 +41,7 @@ dependencies:
   flutter_slidable: ^0.5.4
   #time_machine: ^0.9.9
   directory_picker: ^1.0.0
-  file_picker: ^1.12.0
+  file_picker: ^2.0.7
   rich_code_editor:
     git: https://github.com/redsolver/rich_code_editor.git
   device_info: ">=0.4.2+4 <2.0.0"
@@ -50,7 +49,7 @@ dependencies:
   receive_sharing_intent: ^1.4.1
 
 dev_dependencies:
-  flutter_launcher_icons: ^0.7.3
+  flutter_launcher_icons: ^0.8.1
 
 flutter_icons:
   android: true
