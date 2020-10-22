@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:app/editor/pairer.dart';
 import 'package:app/editor/syntax_highlighter.dart';
 import 'package:app/main.dart';
 import 'package:file_picker/file_picker.dart';
@@ -572,7 +573,7 @@ class _EditPageState extends State<EditPage> {
                       : Column(
                           children: <Widget>[
                             Expanded(
-                              /* 
+                              /*
                           fit: FlexFit.tight, */
                               child: Scrollbar(
                                 child: SingleChildScrollView(
@@ -590,6 +591,7 @@ class _EditPageState extends State<EditPage> {
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface),
+                                      inputFormatters: [CharacterPair(PrefService.getBool('editor_pair_brackets') ?? false)],
                                       textCapitalization:
                                           TextCapitalization.sentences,
                                       decoration: null,
@@ -625,7 +627,7 @@ class _EditPageState extends State<EditPage> {
                                 color: Colors.transparent,
                                 child: Row(
                                   children: <Widget>[
-                                    /* 
+                                    /*
                                 if (history.isNotEmpty) */
                                     Flexible(
                                       fit: FlexFit.tight,
