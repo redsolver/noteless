@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
       'theme': 'light',
       'search_content': true,
       'editor_mode_switcher': true,
-      'editor_pair_brackets': true,
+      'editor_pair_brackets': false,
       'notes_list_virtual_tags': false,
       'debug_logs_sync': false,
       'editor_auto_save': false,
