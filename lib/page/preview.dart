@@ -178,7 +178,7 @@ table, th, td {
 }
 
 th, td {
-  padding: 4px;
+  padding: 8px;
 }
 
 tr:nth-child(even) {background-color: #f2f2f2;}
