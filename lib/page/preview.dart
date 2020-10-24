@@ -181,6 +181,8 @@ th, td {
   padding: 4px;
 }
 
+tr:nth-child(even) {background-color: #f2f2f2;}
+
 pre {
   max-width: 100%;
   overflow-x: scroll;
