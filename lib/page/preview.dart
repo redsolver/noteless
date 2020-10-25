@@ -181,7 +181,7 @@ th, td {
   padding: 8px;
 }
 
-tr:nth-child(even) {background-color: #f2f2f2;}
+tr:nth-child(even) {background-color: ${theme.brightness == Brightness.light ? '#f2f2f2' : '#404040'};}
 
 pre {
   max-width: 100%;
