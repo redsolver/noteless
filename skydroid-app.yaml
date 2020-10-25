@@ -29,9 +29,10 @@ localized:
       * Tutorial notes which explain how to use the app
     summary: A markdown note-taking app for mobile devices.
     whatsNew: |-
-      - Added feature to create a new note by sharing text with Noteless
-      - Adding an attachment to a note now automatically embeds it
-      - Improved blockquote styling
+      - Added optional auto save option
+      - Added optional auto pairing of brackets/quotes (thanks to @RubbaBoy)
+      - Editor: Added option to move and restore note to/from trash
+      - Improved table styling (thanks to @davidebersani)
       - Fixed some bugs
     phoneScreenshotsBaseUrl: https://github.com/redsolver/noteless/raw/master/screenshots/
     phoneScreenshots:
@@ -49,6 +50,10 @@ localized:
       - screen12.png
 
 builds:
+  - versionName: 1.3.1
+    versionCode: 131
+    sha256: f07d181d62900032f18298ff9929e94f6e4c918f01ee35f90803a652bc96d27f
+    apkLink: sia://AACtT7jOS67iZOOlEt-ohYiRFL17tU-MWuQWqPZfBw0rcw
   - versionName: 1.3.0
     versionCode: 130
     sha256: 27fcb5fb965af49d5bc8c8e1a76752b2576696e6e3d573f7b90dc6e0ac5677ce
@@ -70,8 +75,8 @@ builds:
     sha256: d45235776d7ce1720a90e18dbf4937188eee442279998a13214b31d62ddaf6f5
     apkLink: sia://AADXh9owFYA9k2woHWDB3wA296xf-jRsKI_2-DtNUrUNuA
 
-currentVersionName: 1.3.0
-currentVersionCode: 130
+currentVersionName: 1.3.1
+currentVersionCode: 131
 
 added: 1596499200000
-lastUpdated: 1600606036678
+lastUpdated: 1603639889530

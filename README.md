@@ -57,6 +57,14 @@ Compatible with notes saved in [Notable](https://notable.app/)
 
 ## Changelog
 
+### 1.3.1
+
+- Added optional auto save option
+- Added optional auto pairing of brackets/quotes (thanks to @RubbaBoy)
+- Editor: Added option to move and restore note to/from trash
+- Improved table styling (thanks to @davidebersani)
+- Fixed some bugs
+
 ### 1.3.0
 
 - Added feature to create a new note by sharing text with Noteless (#42)
