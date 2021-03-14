@@ -135,37 +135,43 @@ class _EditPageState extends State<EditPage> {
     if (_saved) return true;
     return await showDialog(
             context: context,
-            child: AlertDialog(
-              title: Text('Unsaved changes'),
-              content:
-                  Text('Do you really want to discard your current changes?'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-                FlatButton(
-                  child: Text('Discard'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                )
-              ],
-            )) ??
+            builder: (context) => AlertDialog(
+                  title: Text('Unsaved changes'),
+                  content: Text(
+                      'Do you really want to discard your current changes?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    FlatButton(
+                      child: Text('Discard'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    )
+                  ],
+                )) ??
         false;
   }
 
   Future<void> save() async {
-    String markedTitle = markd.markdownToHtml(
-        RegExp(
-          r'(?<=# ).*',
-        ).stringMatch(currentData),
-        extensionSet: markd.ExtensionSet.gitHubWeb);
-    // print(markedTitle);
+    String title;
 
-    String title = markedTitle.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+    try {
+      String markedTitle = markd.markdownToHtml(
+          RegExp(
+            r'(?<=# ).*',
+          ).stringMatch(currentData),
+          extensionSet: markd.ExtensionSet.gitHubWeb);
+      // print(markedTitle);
+
+      title = markedTitle.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+    } catch (e) {
+      title = note.title;
+    }
     // print(title);
 
     File oldFile;
@@ -591,7 +597,11 @@ class _EditPageState extends State<EditPage> {
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSurface),
-                                      inputFormatters: [CharacterPair(PrefService.getBool('editor_pair_brackets') ?? false)],
+                                      inputFormatters: [
+                                        CharacterPair(PrefService.getBool(
+                                                'editor_pair_brackets') ??
+                                            false)
+                                      ],
                                       textCapitalization:
                                           TextCapitalization.sentences,
                                       decoration: null,

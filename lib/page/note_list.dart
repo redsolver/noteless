@@ -398,28 +398,31 @@ class _NoteListPageState extends State<NoteListPage> {
                                       onTap: () async {
                                         if (await showDialog(
                                                 context: context,
-                                                child: AlertDialog(
-                                                  title: Text(
-                                                      'Do you really want to delete this note?'),
-                                                  content: Text(
-                                                      'This will delete it permanently.'),
-                                                  actions: <Widget>[
-                                                    FlatButton(
-                                                      child: Text('Cancel'),
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop(false);
-                                                      },
-                                                    ),
-                                                    FlatButton(
-                                                      child: Text('Delete'),
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop(true);
-                                                      },
-                                                    )
-                                                  ],
-                                                )) ??
+                                                builder: (context) =>
+                                                    AlertDialog(
+                                                      title: Text(
+                                                          'Do you really want to delete this note?'),
+                                                      content: Text(
+                                                          'This will delete it permanently.'),
+                                                      actions: <Widget>[
+                                                        FlatButton(
+                                                          child: Text('Cancel'),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(false);
+                                                          },
+                                                        ),
+                                                        FlatButton(
+                                                          child: Text('Delete'),
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(true);
+                                                          },
+                                                        )
+                                                      ],
+                                                    )) ??
                                             false) {
                                           store.allNotes.remove(note);
                                           PersistentStore.deleteNote(note);
@@ -853,32 +856,35 @@ class _NoteListPageState extends State<NoteListPage> {
                                               onTap: () async {
                                                 if (await showDialog(
                                                         context: context,
-                                                        child: AlertDialog(
-                                                          title: Text(
-                                                              'Do you really want to delete the selected notes?'),
-                                                          content: Text(
-                                                              'This will delete them permanently.'),
-                                                          actions: <Widget>[
-                                                            FlatButton(
-                                                              child: Text(
-                                                                  'Cancel'),
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(false);
-                                                              },
-                                                            ),
-                                                            FlatButton(
-                                                              child: Text(
-                                                                  'Delete'),
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(true);
-                                                              },
-                                                            )
-                                                          ],
-                                                        )) ??
+                                                        builder:
+                                                            (context) =>
+                                                                AlertDialog(
+                                                                  title: Text(
+                                                                      'Do you really want to delete the selected notes?'),
+                                                                  content: Text(
+                                                                      'This will delete them permanently.'),
+                                                                  actions: <
+                                                                      Widget>[
+                                                                    FlatButton(
+                                                                      child: Text(
+                                                                          'Cancel'),
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.of(context)
+                                                                            .pop(false);
+                                                                      },
+                                                                    ),
+                                                                    FlatButton(
+                                                                      child: Text(
+                                                                          'Delete'),
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.of(context)
+                                                                            .pop(true);
+                                                                      },
+                                                                    )
+                                                                  ],
+                                                                )) ??
                                                     false) {
                                                   await _modifyAll((Note note) {
                                                     store.allNotes.remove(note);
