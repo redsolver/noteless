@@ -34,6 +34,7 @@ if (keystorePropertiesFile.exists()) {
 
 
 android {
+    ndkVersion "22.0.7026061"
     compileSdkVersion 29
 
     sourceSets {
@@ -46,7 +47,7 @@ android {
 
     defaultConfig {
         applicationId "net.redsolver.noteless"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

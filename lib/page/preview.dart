@@ -233,12 +233,19 @@ blockquote{
   </html>''';
 
 /*     generatedPreview = generatedPreview.replaceAll('\\ ', ' '); */
-    generatedPreview = generatedPreview.replaceAll(
-        'src="@attachment/',
-        'src="' +
-            'file://' +
-            PrefService.getString('notable_attachments_directory') +
-            '/');
+    generatedPreview = generatedPreview
+        .replaceAll(
+            'src="@attachment/',
+            'src="' +
+                'file://' +
+                PrefService.getString('notable_attachments_directory') +
+                '/')
+        .replaceAll(
+            'src="/',
+            'src="' +
+                'file://' +
+                PrefService.getString('notable_notes_directory') +
+                '/');
 
     generatedPreview =
         generatedPreview.replaceAll('<img ', '<img width="100%" ');

@@ -6,25 +6,60 @@ import 'package:front_matter/front_matter.dart' as fm;
 
 import 'package:app/model/note.dart';
 
-class PersistentStore {
-  static Future<String> readContent(File file) async {
-    if (!file.existsSync()) return null;
+const supportedFrontMatterKeys = [
+  'title',
+  'modified',
+  'created',
+  'tags',
+  'attachments',
+  'pinned',
+  'favorited',
+  'deleted',
+  'updated',
+];
 
-    String fileContent = await file.readAsString();
+class PersistentStore {
+  static bool get isDendronModeEnabled =>
+      (PrefService.getBool('dendron_mode') ?? false);
+
+  static Future<String> readContent(
+    Note note,
+  ) async {
+    if (!note.file.existsSync()) return null;
+
+    String fileContent = await note.file.readAsString();
+
+    var content;
 
     if (fileContent.trimLeft().startsWith('---')) {
       var doc = fm.parse(fileContent);
-      if (doc.content != null) return doc.content.trimLeft();
+      if (doc.content != null) {
+        content = doc.content.trimLeft();
+      } else {
+        content = fileContent.trimLeft();
+      }
+    } else {
+      content = fileContent.trimLeft();
     }
 
-    return fileContent.trimLeft();
+    if (isDendronModeEnabled) {
+      if (!content.startsWith('# ')) {
+        content = '# ${note.title}\n\n' + content;
+      }
+    }
+
+    return content;
   }
 
   static Future saveNote(Note note, [String content]) async {
     // print('PersistentStore.saveNote');
 
     if (content == null) {
-      content = await readContent(note.file);
+      content = await readContent(note);
+    }
+    if (isDendronModeEnabled) {
+      final index = content.indexOf('\n');
+      if (index != -1) content = content.substring(index).trimLeft();
     }
 
     String header = '---\n';
@@ -36,15 +71,29 @@ class PersistentStore {
       note.tags.removeWhere((s) => s.startsWith('#/'));
     }
 
-    if (note.tags.isNotEmpty) data['tags'] = note.tags;
+    if (!isDendronModeEnabled) {
+      if (note.tags.isNotEmpty) data['tags'] = note.tags;
+    }
+
     if (note.attachments.isNotEmpty) data['attachments'] = note.attachments;
 
-    data['created'] = note.created.toIso8601String();
-    data['modified'] = note.modified.toIso8601String();
+    if (note.usesMillis ?? false) {
+      data['created'] = note.created.millisecondsSinceEpoch;
+      data[note.usesUpdatedInsteadOfModified ? 'updated' : 'modified'] =
+          note.modified.millisecondsSinceEpoch;
+    } else {
+      data['created'] = note.created.toIso8601String();
+      data[note.usesUpdatedInsteadOfModified ? 'updated' : 'modified'] =
+          note.modified.toIso8601String();
+    }
 
     if (note.pinned) data['pinned'] = true;
     if (note.favorited) data['favorited'] = true;
     if (note.deleted) data['deleted'] = true;
+
+    if (note.additionalFrontMatterKeys != null) {
+      data.addAll(note.additionalFrontMatterKeys.cast<String, dynamic>());
+    }
 
     header += toYamlString(data);
 
@@ -88,7 +137,7 @@ class PersistentStore {
 
     note.file = file;
 
-    note.title = header['title'];
+    note.title = header['title'].toString();
 
     if (note.title == null) {
       var title = file.path.split('/').last;
@@ -98,15 +147,34 @@ class PersistentStore {
       note.title = title;
     }
 
-    if (header['modified'] != null) {
-      note.modified = DateTime.parse(header['modified']);
+    if (header['modified'] != null && !isDendronModeEnabled) {
+      if (header['modified'] is int) {
+        note.usesMillis = true;
+        note.modified = DateTime.fromMillisecondsSinceEpoch(header['modified']);
+      } else {
+        note.modified = DateTime.tryParse(header['modified']);
+      }
+    } else if (header['updated'] != null) {
+      note.usesUpdatedInsteadOfModified = true;
+      if (header['updated'] is int) {
+        note.usesMillis = true;
+        note.modified = DateTime.fromMillisecondsSinceEpoch(header['updated']);
+      } else {
+        note.modified = DateTime.tryParse(header['updated']);
+      }
     } else {
       note.modified = file.lastModifiedSync();
     }
 
     if (header['created'] != null) {
-      note.created = DateTime.parse(header['created']);
-    } else {
+      if (header['created'] is int) {
+        note.usesMillis = true;
+        note.created = DateTime.fromMillisecondsSinceEpoch(header['created']);
+      } else {
+        note.created = DateTime.tryParse(header['created']);
+      }
+    }
+    if (note.created == null) {
       note.created = note.modified;
     }
 
@@ -119,6 +187,13 @@ class PersistentStore {
     note.pinned = header['pinned'] ?? false;
     note.favorited = header['favorited'] ?? false;
     note.deleted = header['deleted'] ?? false;
+
+    if (header.isNotEmpty) {
+      note.additionalFrontMatterKeys = Map<String, dynamic>.from(header);
+
+      note.additionalFrontMatterKeys
+          .removeWhere((key, value) => supportedFrontMatterKeys.contains(key));
+    }
 
     return note;
   }

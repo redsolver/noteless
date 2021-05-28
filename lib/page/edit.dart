@@ -64,7 +64,7 @@ class _EditPageState extends State<EditPage> {
     /*  String content = note.file.readAsStringSync();
 
     var doc = fm.parse(content); */
-    final content = await PersistentStore.readContent(note.file);
+    final content = await PersistentStore.readContent(note);
 
     _rec = RichCodeEditingController(_syntaxHighlighterBase,
         text: content.trimLeft());
@@ -161,6 +161,8 @@ class _EditPageState extends State<EditPage> {
     String title;
 
     try {
+      if (!currentData.trimLeft().startsWith('# ')) throw 'No MD title';
+
       String markedTitle = markd.markdownToHtml(
           RegExp(
             r'(?<=# ).*',
@@ -175,7 +177,7 @@ class _EditPageState extends State<EditPage> {
     // print(title);
 
     File oldFile;
-    if (note.title != title) {
+    if (note.title != title && !store.isDendronModeEnabled) {
       if (File(PrefService.getString('notable_notes_directory') +
               '/' +
               title +
@@ -224,7 +226,22 @@ class _EditPageState extends State<EditPage> {
       child: Scaffold(
           key: _scaffold,
           appBar: AppBar(
-            title: Text(note.title),
+            title: store.isDendronModeEnabled
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(note.title),
+                      Text(
+                        note.file.path
+                            .substring(store.notesDir.path.length + 1),
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      )
+                    ],
+                  )
+                : Text(note.title),
             actions: <Widget>[
               if (!_saved)
                 IconButton(
@@ -534,6 +551,7 @@ class _EditPageState extends State<EditPage> {
                         ],
                       ),
                     ),
+                    //if (!store.isDendronModeEnabled) ...[
                     for (String tag in note.tags)
                       PopupMenuItem<String>(
                         value: 'removeTag.$tag',
@@ -565,6 +583,7 @@ class _EditPageState extends State<EditPage> {
                         ],
                       ),
                     ),
+                    //]
                   ];
                 },
               )

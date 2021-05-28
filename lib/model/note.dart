@@ -11,6 +11,10 @@ class Note {
   bool deleted = false;
   File file;
 
+  bool usesMillis = false;
+  bool usesUpdatedInsteadOfModified = false;
+  Map<String, dynamic> additionalFrontMatterKeys;
+
   bool hasTag(String cTag) {
     if (cTag != '') {
       if (cTag == 'Trash') {
@@ -34,5 +38,4 @@ class Note {
     //if (note.deleted) return false;
     return true;
   }
-
 }

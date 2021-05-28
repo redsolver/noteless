@@ -19,7 +19,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  file_picker_writable: ^2.0.0
   flutter_markdown: ^0.4.2
   path_provider: ^2.0.0
   yaml: ^2.2.0
@@ -40,16 +39,19 @@ dependencies:
   front_matter: ^1.1.0
   flutter_slidable: ^0.5.4
   #time_machine: ^0.9.9
-  directory_picker: ^1.0.0
   file_picker: ^3.0.0
   rich_code_editor:
-    git: https://github.com/redsolver/rich_code_editor.git
+    git: https://github.com/bats64mgutsi/rich_code_editor.git
   device_info: ^2.0.0
   quick_actions: ^0.4.0+8
   receive_sharing_intent: ^1.4.1
   quiver: ^3.0.0
   intl: ^0.17.0
+  permission_handler: ^6.1.0
+  uuid: ^3.0.3
 
+dependency_overrides:
+  shared_preferences: ^2.0.4
 # dev_dependencies:
 # flutter_launcher_icons: ^0.8.1
 flutter_icons:

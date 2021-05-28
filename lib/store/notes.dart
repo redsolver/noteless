@@ -9,6 +9,15 @@ import 'package:app/data/samples.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class NotesStore {
+  /* String subDirectoryNotes = ;
+  String subDirectoryAttachments = ; */
+
+  String get subDirectoryNotes => isDendronModeEnabled ? '' : '/notes';
+  String get subDirectoryAttachments =>
+      isDendronModeEnabled ? '/assets' : '/attachments';
+
+  bool get isDendronModeEnabled => PrefService.getBool('dendron_mode') ?? false;
+
   Directory notesDir, attachmentsDir;
 
   String searchText;
@@ -58,21 +67,23 @@ class NotesStore {
     }
     PrefService.setString('notable_directory', directory.path);
 
-    notesDir = Directory('${directory.path}/notes');
+    // print(isDendronModeEnabled);
+
+    notesDir = Directory('${directory.path}$subDirectoryNotes');
 
     PrefService.setString('notable_notes_directory', notesDir.path);
 
     if (!notesDir.existsSync()) {
       notesDir.createSync();
-      await createTutorialNotes();
+      if (!isDendronModeEnabled) await createTutorialNotes();
     }
 
-    attachmentsDir = Directory('${directory.path}/attachments');
+    attachmentsDir = Directory('${directory.path}$subDirectoryAttachments');
     PrefService.setString('notable_attachments_directory', attachmentsDir.path);
 
     if (!attachmentsDir.existsSync()) {
       attachmentsDir.createSync();
-      await createTutorialAttachments();
+      if (!isDendronModeEnabled) await createTutorialAttachments();
     }
 
     /* for (String fileName in Samples.tutorialNotes) {
@@ -91,15 +102,26 @@ class NotesStore {
     // _updateTagList();
   }
 
-  Future _listNotesInFolder(String dir, [bool isSubDirectory = false]) async {
+  Future _listNotesInFolder(String dir, {bool isSubDirectory = false}) async {
     await for (var entity in Directory('${notesDir.path}$dir').list()) {
       if (entity is File) {
         try {
+          if (isDendronModeEnabled) {
+            if (!entity.path.endsWith('.md')) continue;
+          }
           Note note = await PersistentStore.readNote(entity);
 
           if (note != null) {
             if (PrefService.getBool('notes_list_virtual_tags') ?? false) {
               if (isSubDirectory) note.tags.add('#$dir');
+            }
+            if (isDendronModeEnabled) {
+              var path = entity.path
+                  .substring(notesDir.path.length, entity.path.length - 3);
+              while (path.startsWith('/')) {
+                path = path.substring(1);
+              }
+              note.tags.add('${path.replaceAll('.', '/')}');
             }
 
             allNotes.add(note);
@@ -121,7 +143,16 @@ class NotesStore {
           allNotes.add(note);
         }
       } else if (entity is Directory) {
-        await _listNotesInFolder(dir + '/' + entity.path.split('/').last, true);
+        final dirName = entity.path.split('/').last;
+
+        if (dirName.startsWith('.')) continue;
+
+        if (entity.path.startsWith(attachmentsDir.path)) continue;
+
+        await _listNotesInFolder(
+          dir + '/' + dirName,
+          isSubDirectory: true,
+        );
       }
     }
   }
@@ -133,12 +164,17 @@ class NotesStore {
       }
     }
 
+    final tmpRootTags = <String>{};
+
     for (String tag in allTags) {
-      rootTags.add(tag.split('/').first);
+      tmpRootTags.add(tag.split('/').first);
     }
+
+    rootTags = tmpRootTags.toList();
+    rootTags.sort();
   }
 
-  Set<String> getSubTags(String forTag) {
+  List<String> getSubTags(String forTag) {
     Set<String> subTags =
         allTags.where((tag) => tag.startsWith(forTag) && tag != forTag).toSet();
 
@@ -146,7 +182,13 @@ class NotesStore {
 
     subTags = subTags.map((String t) => t.split('/').first).toSet();
 
-    return subTags;
+    final subTagsList = subTags.toList();
+
+    if (PrefService.getBool('sort_tags_in_sidebar') ?? true) {
+      subTagsList.sort();
+    }
+
+    return subTagsList;
   }
 
   filterAndSortNotes() {
@@ -238,7 +280,7 @@ class NotesStore {
 
   Set<String> allTags = {};
 
-  Set<String> rootTags = {};
+  List<String> rootTags = [];
 
   Future<String> syncNow() async {
 /*     switch (syncMethod) {

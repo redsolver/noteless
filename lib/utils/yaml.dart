@@ -61,8 +61,7 @@ Iterable<String> _sortKeys(Map m) {
     }
   });
 
-  return concat([simple..sort(), maps..sort(), other..sort()])
-      as Iterable<String>;
+  return concat([simple..sort(), maps..sort(), other..sort()]).cast<String>();
 }
 
 void _listToYamlString(

@@ -13,6 +13,7 @@ import 'package:preferences/preferences.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:uuid/uuid.dart';
 // import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'about.dart';
@@ -491,6 +492,10 @@ class _NoteListPageState extends State<NoteListPage> {
                                 child: ListTile(
                                   selected: _selectedNotes.contains(note.title),
                                   title: Text(note.title),
+                                  subtitle: store.isDendronModeEnabled
+                                      ? Text(note.file.path.substring(
+                                          store.notesDir.path.length + 1))
+                                      : null,
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
@@ -532,10 +537,15 @@ class _NoteListPageState extends State<NoteListPage> {
                                       });
                                       return;
                                     }
+
                                     await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                EditPage(note, store)));
+                                      MaterialPageRoute(
+                                        builder: (context) => EditPage(
+                                          note,
+                                          store,
+                                        ),
+                                      ),
+                                    );
                                     _filterAndSortNotes();
                                   },
                                   onLongPress: () {
@@ -994,21 +1004,29 @@ class _NoteListPageState extends State<NoteListPage> {
       if (i > 1) title += ' ($i)';
 
       bool exists = false;
-      print(i);
+
       for (Note note in store.allNotes) {
         if (title == note.title) {
           exists = true;
           break;
         }
       }
-      print(i);
+
       if (!exists) {
         newNote.title = title;
         break;
       }
-      print(i);
 
       i++;
+    }
+
+    if (store.isDendronModeEnabled) {
+      newNote.usesMillis = true;
+      newNote.usesUpdatedInsteadOfModified = true;
+      newNote.additionalFrontMatterKeys = {
+        'id': Uuid().v4(),
+        'desc': '',
+      };
     }
 
     newNote.created = DateTime.now();

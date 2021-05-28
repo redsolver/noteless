@@ -1,3 +1,5 @@
+// @dart=2.9
+
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:preferences/preference_service.dart';
@@ -18,10 +20,10 @@ main() async {
   Intl.defaultLocale = 'en_US';
 
   final deviceInfo = DeviceInfoPlugin();
-  final androidInfo = await deviceInfo.androidInfo;
+  androidDeviceInfo = await deviceInfo.androidInfo;
 
   // Disable note preview/render feature on Android KitKat see #32
-  if (androidInfo.version.sdkInt < 20) {
+  if (androidDeviceInfo.version.sdkInt < 20) {
     previewFeatureEnabled = false;
   }
 
@@ -32,6 +34,8 @@ main() async {
     ),
   );
 }
+
+AndroidDeviceInfo androidDeviceInfo;
 
 bool previewFeatureEnabled = true;
 

@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:math';
 
-import 'package:directory_picker/directory_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:app/provider/theme.dart';
 import 'package:app/store/notes.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:preferences/preferences.dart';
 import 'package:preferences/radio_preference.dart';
@@ -33,6 +35,8 @@ class _SettingsPageState extends State<SettingsPage> {
       'notes_list_virtual_tags': false,
       'debug_logs_sync': false,
       'editor_auto_save': false,
+      'dendron_mode': false,
+      'sort_tags_in_sidebar': true,
     });
     super.initState();
   }
@@ -157,16 +161,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 PrefService.getString('notable_external_directory') ?? '',
               ),
               onTap: () async {
-                String path =
-                    PrefService.getString('notable_external_directory');
-                Directory newDirectory = await DirectoryPicker.pick(
-                    allowFolderCreation: true,
-                    context: context,
-                    rootDirectory: path != null
-                        ? Directory(path)
-                        : (await getExternalStorageDirectory()));
-                print(newDirectory);
-                if (newDirectory != null) {
+                Directory dir;
+
+                final dirStr = await _pickExternalDir();
+
+                if (dirStr == null) {
+                  return;
+                }
+
+                dir = Directory(dirStr);
+
+                if (dir != null) {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
@@ -177,8 +182,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     barrierDismissible: false,
                   );
-                  PrefService.setString(
-                      'notable_external_directory', newDirectory.path);
+                  PrefService.setString('notable_external_directory', dir.path);
 
                   await store.listNotes();
                   await store.filterAndSortNotes();
@@ -207,6 +211,11 @@ class _SettingsPageState extends State<SettingsPage> {
         SwitchPreference(
           'Search content of notes',
           'search_content',
+        ),
+        PreferenceTitle('Tags'),
+        SwitchPreference(
+          'Sort tags alphabetically in the sidebar',
+          'sort_tags_in_sidebar',
         ),
         PreferenceTitle('Preview'),
         SwitchPreference(
@@ -306,6 +315,18 @@ class _SettingsPageState extends State<SettingsPage> {
         ), */
         PreferenceTitle('Experimental'),
         SwitchPreference(
+          'Enable Dendron support',
+          'dendron_mode',
+          desc: 'Dendron is a VSCode-based note-taking tool',
+          onChange: () async {
+            await store.listNotes();
+            await store.filterAndSortNotes();
+            await store.updateTagList();
+
+            if (mounted) setState(() {});
+          },
+        ),
+        SwitchPreference(
           'Automatic bullet points',
           'auto_bullet_points',
           desc:
@@ -319,5 +340,41 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ]),
     );
+  }
+
+  Future<String> _pickExternalDir() async {
+    if (!await Permission.storage.request().isGranted) {
+      return null;
+    }
+
+    var dir = await FilePicker.platform.getDirectoryPath();
+    if ((dir ?? '').isNotEmpty) {
+      if (await _checkIfDirectoryIsWritable(dir)) {
+        return dir;
+      }
+    }
+
+    if ((await Permission.storage.request()).isDenied) {
+      return null;
+    }
+
+    var externalDir = await getExternalStorageDirectory();
+    if (await _checkIfDirectoryIsWritable(externalDir.path)) {
+      return externalDir.path;
+    }
+    return null;
+  }
+
+  Future<bool> _checkIfDirectoryIsWritable(String path) async {
+    final testFile = File('$path/${Random().nextInt(1000000)}');
+
+    try {
+      await testFile.create(recursive: true);
+      await testFile.writeAsString("This is only a test file, please ignore.");
+      await testFile.delete();
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
 }
