@@ -846,6 +846,76 @@ class _EditPageState extends State<EditPage> {
                                         ),
                                       ),
                                     ),
+                                    Flexible(
+                                      fit: FlexFit.tight,
+                                      child: SizedBox(
+                                        height: double.infinity,
+                                        child: InkWell(
+                                          child: Icon(
+                                            MdiIcons.checkBoxOutline,
+                                          ),
+                                          onTap: () {
+                                            int oldStart = _rec.selection.start;
+
+                                            int start = oldStart;
+
+                                            while (start > 0) {
+                                              start--;
+                                              if (_rec.text[start] == '\n')
+                                                break;
+                                            }
+                                            if (start != 0) start++;
+
+                                            String startOfLine =
+                                            _rec.text.substring(
+                                              start,
+                                            );
+                                            final before =
+                                            _rec.text.substring(0, start);
+
+                                            if (startOfLine
+                                                .trimLeft()
+                                                .startsWith('- [ ]') || startOfLine
+                                                .trimLeft()
+                                                .startsWith('- [x]')) {
+                                              int lengthDiff =
+                                                  startOfLine.length;
+
+                                              lengthDiff = lengthDiff -
+                                                  (startOfLine
+                                                      .trimLeft()
+                                                      .length);
+
+                                              if (lengthDiff >= 8) {
+                                                _rec.text = before +
+                                                    startOfLine
+                                                        .trimLeft()
+                                                        .substring(6);
+                                                _rec.selection = TextSelection(
+                                                    baseOffset: oldStart -
+                                                        2 -
+                                                        lengthDiff,
+                                                    extentOffset: oldStart -
+                                                        2 -
+                                                        lengthDiff);
+                                              } else {
+                                                _rec.text =
+                                                    before + '  ' + startOfLine;
+                                                _rec.selection = TextSelection(
+                                                    baseOffset: oldStart + 2,
+                                                    extentOffset: oldStart + 2);
+                                              }
+                                            } else {
+                                              _rec.text =
+                                                  before + '- [ ] ' + startOfLine;
+                                              _rec.selection = TextSelection(
+                                                  baseOffset: oldStart + 6,
+                                                  extentOffset: oldStart + 6);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
                                     Container(
                                       width: 1,
                                       color: Colors.grey,
