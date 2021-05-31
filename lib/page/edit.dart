@@ -846,7 +846,7 @@ class _EditPageState extends State<EditPage> {
                                         ),
                                       ),
                                     ),
-                                    Flexible(
+                                    /* Flexible(
                                       fit: FlexFit.tight,
                                       child: SizedBox(
                                         height: double.infinity,
@@ -915,7 +915,7 @@ class _EditPageState extends State<EditPage> {
                                           },
                                         ),
                                       ),
-                                    ),
+                                    ), */
                                     Container(
                                       width: 1,
                                       color: Colors.grey,
