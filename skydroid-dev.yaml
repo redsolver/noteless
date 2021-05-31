@@ -1,6 +1,6 @@
 name: noteless.redsolver
 metadataFile: skydroid-app.yaml
-skynetPortal: https://siasky.net
+skynetPortal: https://skyportal.xyz
 
 checkVersion:
   file: pubspec.yaml

@@ -10,9 +10,9 @@ class ThemeNotifier with ChangeNotifier {
   ThemeType currentTheme = ThemeType.light;
   ThemeData _currentThemeData;
 
-  void switchTheme() => currentTheme == ThemeType.light
+/*  void switchTheme() => currentTheme == ThemeType.light
       ? currentTheme = ThemeType.dark
-      : currentTheme = ThemeType.light;
+      : currentTheme = ThemeType.light; */
 
   updateTheme([String theme]) {
     switch (theme) {

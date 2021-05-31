@@ -29,11 +29,10 @@ localized:
       * Tutorial notes which explain how to use the app
     summary: A markdown note-taking app for mobile devices.
     whatsNew: |-
-      - Added optional auto save option
-      - Added optional auto pairing of brackets/quotes (thanks to @RubbaBoy)
-      - Editor: Added option to move and restore note to/from trash
-      - Improved table styling (thanks to @davidebersani)
-      - Fixed some bugs
+      • Added support for the Android 11 permission system
+      • Added option to sort tags alphabetically in the sidebar
+      • Improved compatibility with other Markdown-based note-taking tools (especially Dendron)
+      • Some small bug and theme fixes
     phoneScreenshotsBaseUrl: https://github.com/redsolver/noteless/raw/master/screenshots/
     phoneScreenshots:
       - screen1.png
@@ -50,6 +49,10 @@ localized:
       - screen12.png
 
 builds:
+  - versionName: 1.4.6
+    versionCode: 146
+    sha256: 0a87e7d4e8be4deced4f1b68541bb226713f9415c381006e8546526838d12666
+    apkLink: sia://AAABwMBQUJFBZimB_GXOqZ-aAfKlGd1X0zvcEAcgQuA2Dg
   - versionName: 1.3.1
     versionCode: 131
     sha256: f07d181d62900032f18298ff9929e94f6e4c918f01ee35f90803a652bc96d27f
@@ -75,8 +78,8 @@ builds:
     sha256: d45235776d7ce1720a90e18dbf4937188eee442279998a13214b31d62ddaf6f5
     apkLink: sia://AADXh9owFYA9k2woHWDB3wA296xf-jRsKI_2-DtNUrUNuA
 
-currentVersionName: 1.3.1
-currentVersionCode: 131
+currentVersionName: 1.4.6
+currentVersionCode: 146
 
 added: 1596499200000
-lastUpdated: 1603639889530
+lastUpdated: 1622477905134

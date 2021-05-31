@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.6
+
+- Added support for the Android 11 permission system
+- Added option to sort tags alphabetically in the sidebar
+- Improved compatibility with other Markdown-based note-taking tools (especially Dendron)
+- Some small bug and theme fixes
+
 ## 1.3.1
 
 - Added optional auto save option
@@ -65,7 +72,7 @@
 - Disabled the preview feature on Android 4.4 KitKat devices.
 - Removed WebDav sync
 
-## Important Changes in Version 0.2.0 
+## Important Changes in Version 0.2.0
 
 The app has been renamed from `Notable Mobile` to `Noteless` on 02.07.2020.
 
@@ -94,7 +101,7 @@ I recommend using an external data directory and a third-party sync app for Andr
 - Added options to restore notes from trash
   - With the swipe actions of a note
   - With the "Restore from trash" button in the multi select options
-- Added option to create a logfile for sync 
+- Added option to create a logfile for sync
 - Added experimental option to enable virtual folder tags
 - Minor theme fixes
 
